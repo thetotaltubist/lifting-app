@@ -303,7 +303,7 @@ export default function WorkoutScreen() {
                     <>
                       <Muted style={{ marginTop: 10, marginBottom: 6 }}>Where?</Muted>
                       <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                        {painAreasFor(ex.exerciseId).map((a) => (
+                        {painAreasFor(active.dayId).map((a) => (
                           <Chip
                             key={a}
                             label={a}

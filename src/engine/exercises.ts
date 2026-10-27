@@ -199,26 +199,13 @@ export const MUSCLE_NAMES: Record<Muscle, string> = {
   abs: 'Abs',
 };
 
-// Joints each muscle's exercises load, offered when John reports pain
-const JOINTS: Record<Muscle, string[]> = {
-  chest: ['Shoulder', 'Elbow', 'Wrist'],
-  back: ['Shoulder', 'Elbow', 'Lower back'],
-  frontDelts: ['Shoulder', 'Elbow', 'Wrist'],
-  sideDelts: ['Shoulder', 'Elbow'],
-  rearDelts: ['Shoulder'],
-  triceps: ['Elbow', 'Shoulder', 'Wrist'],
-  biceps: ['Elbow', 'Wrist', 'Shoulder'],
-  quads: ['Knee', 'Hip', 'Lower back'],
-  hamstrings: ['Lower back', 'Knee', 'Hip'],
-  glutes: ['Hip', 'Lower back', 'Knee'],
-  calves: ['Ankle', 'Knee'],
-  abs: ['Lower back', 'Hip'],
+// Body parts to offer when John reports pain, by day type
+const PAIN_AREAS: Record<string, string[]> = {
+  push: ['Shoulder', 'Elbow'],
+  pull: ['Back', 'Elbow'],
+  legs: ['Glute', 'Knee', 'Calf'],
 };
 
-// Body parts to offer for a pain rating: the joints first, then the muscles
-export function painAreasFor(exerciseId: string): string[] {
-  const e = exercise(exerciseId);
-  const muscles = [e.primary, ...e.secondary];
-  const joints = muscles.flatMap((m) => JOINTS[m]);
-  return [...new Set([...joints, ...muscles.map((m) => MUSCLE_NAMES[m])]), 'Other'];
+export function painAreasFor(dayId: string): string[] {
+  return PAIN_AREAS[dayId.split('-')[0]] ?? [...new Set(Object.values(PAIN_AREAS).flat())];
 }
