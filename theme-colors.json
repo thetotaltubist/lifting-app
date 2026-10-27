@@ -1,0 +1,16 @@
+{
+  "bg": { "light": "#F2F1EE", "dark": "#121212" },
+  "card": { "light": "#FFFFFF", "dark": "#1E1E1F" },
+  "text": { "light": "#1B1B1D", "dark": "#EDEDEE" },
+  "muted": { "light": "#6C6B70", "dark": "#A1A0A6" },
+  "accent": { "light": "#D9480F", "dark": "#FF7A45" },
+  "accentSoft": { "light": "#FDEBE2", "dark": "#3A2219" },
+  "border": { "light": "#E4E2DD", "dark": "#2E2E30" },
+  "chip": { "light": "#ECEAE5", "dark": "#2A2A2C" },
+  "track": { "light": "#E0DDD6", "dark": "#38383B" },
+  "field": { "light": "#F4F3F0", "dark": "#2A2A2C" },
+  "placeholder": { "light": "#A9A7A1", "dark": "#6E6D72" },
+  "good": { "light": "#2B8A3E", "dark": "#69DB7C" },
+  "warn": { "light": "#B7791F", "dark": "#F6C25B" },
+  "danger": { "light": "#B3261E", "dark": "#F2B8B5" }
+}
