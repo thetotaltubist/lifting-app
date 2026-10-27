@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { exercise } from './exercises';
+import { alternativesFor, exercise, makeCustomExercise, setCustomExercises } from './exercises';
 import { planNext, nextDayId, ROTATION } from './plan';
 import { suggest } from './progression';
 import { rollingVolume, weeklyTarget } from './volume';
@@ -18,6 +18,7 @@ const settings: Settings = {
   deloadStart: null,
   lastDeloadEnd: null,
   swaps: {},
+  customExercises: [],
   nextDayOverride: null,
 };
 
@@ -150,4 +151,33 @@ test('deload roughly halves the sets', () => {
   const deload = planNext(sessions, { ...settings, deloadStart: at(8).toISOString() }, at(8));
   const sum = (p: typeof normal) => p.exercises.reduce((t, e) => t + e.sets, 0);
   assert.ok(sum(deload) < sum(normal) * 0.75, `${sum(deload)} vs ${sum(normal)}`);
+});
+
+test('a replacement applies on every day and keeps the muscle', () => {
+  const swapped = { ...settings, swaps: { 'pl-incline-press': 'db-incline-press' } };
+  for (const id of ['push-a', 'push-b']) {
+    const plan = planNext([], { ...swapped, nextDayOverride: id }, at(0));
+    const ids = plan.exercises.map((e) => e.exerciseId);
+    assert.ok(ids.includes('db-incline-press'));
+    assert.ok(!ids.includes('pl-incline-press'));
+  }
+});
+
+test('your own exercise can replace one and counts toward volume', () => {
+  const mine = makeCustomExercise({ name: 'Iso-lateral row', primary: 'back', repMin: 8, repMax: 12, kind: 'compound', increment: 10 });
+  setCustomExercises([mine]);
+  const s2 = { ...settings, customExercises: [mine], swaps: { 'cable-row': mine.id }, nextDayOverride: 'pull-a' };
+  const plan = planNext([], s2, at(0));
+  const row = plan.exercises.find((e) => e.exerciseId === mine.id);
+  assert.ok(row);
+  assert.ok(alternativesFor('lat-pulldown').some((e) => e.id === mine.id));
+  const session: Session = {
+    id: 'c',
+    dayId: 'pull-a',
+    startedAt: at(0).toISOString(),
+    finishedAt: at(0).toISOString(),
+    exercises: [{ exerciseId: mine.id, sets: [1, 2].map(() => ({ weight: 100, reps: 10, rir: 2, done: true })) }],
+  };
+  assert.equal(rollingVolume([session], at(1)).back, 2);
+  setCustomExercises([]);
 });

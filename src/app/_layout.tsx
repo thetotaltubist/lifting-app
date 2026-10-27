@@ -18,6 +18,8 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="workout" options={{ title: 'Workout', gestureEnabled: false, headerBackVisible: false }} />
         <Stack.Screen name="science" options={{ title: 'How the plan works' }} />
+        <Stack.Screen name="program" options={{ title: 'Exercises' }} />
+        <Stack.Screen name="new-exercise" options={{ title: 'Add your own', presentation: 'modal' }} />
       </Stack>
     </GestureHandlerRootView>
   );

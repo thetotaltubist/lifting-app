@@ -67,6 +67,7 @@ export type Settings = {
   blockStart: string; // ISO, start of the current training block
   deloadStart: string | null; // ISO, set while a deload week is running
   lastDeloadEnd: string | null; // ISO
-  swaps: Record<string, string>; // template exercise id -> replacement id
+  swaps: Record<string, string>; // template exercise id -> replacement id, on every day it appears
+  customExercises: Exercise[]; // exercises and machines John added himself
   nextDayOverride: string | null;
 };

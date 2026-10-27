@@ -77,6 +77,8 @@ export default function NextScreen() {
   }
 
   const deloadTip = deloadSuggestion(sessions, settings, new Date());
+  // Nothing logged yet in this block
+  const blockJustStarted = !plan.deload && !hasActive && !sessions.some((s) => s.finishedAt >= settings.blockStart);
   const totalSets = plan.exercises.reduce((t, e) => t + e.sets, 0);
 
   return (
@@ -93,6 +95,16 @@ export default function NextScreen() {
             <Text style={styles.h2}>Workout in progress</Text>
             <Muted style={{ marginVertical: 8 }}>You have an unfinished workout.</Muted>
             <Button title="Continue workout" onPress={() => router.push('/workout')} />
+          </Card>
+        )}
+
+        {blockJustStarted && (
+          <Card>
+            <Text style={styles.h2}>New block</Text>
+            <Muted style={{ marginVertical: 8 }}>
+              Good time to change any exercises or machines, before you start building on new numbers.
+            </Muted>
+            <Button title="Review exercises" kind="plain" onPress={() => router.push('/program')} />
           </Card>
         )}
 
