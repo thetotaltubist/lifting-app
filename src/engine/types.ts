@@ -70,4 +70,5 @@ export type Settings = {
   swaps: Record<string, string>; // template exercise id -> replacement id, on every day it appears
   customExercises: Exercise[]; // exercises and machines John added himself
   nextDayOverride: string | null;
+  rotation?: string[]; // day ids in John's order; missing means the default
 };

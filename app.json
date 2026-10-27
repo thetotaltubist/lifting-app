@@ -10,9 +10,14 @@
       "bundleIdentifier": "com.jdicesar.totallift",
       "supportsTablet": true,
       "appleTeamId": "7V9S64W92Z",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSHealthShareUsageDescription": "Total Lift reads your weight, sleep, HRV and resting heart rate to keep your cut from costing muscle. Nothing is written to Health."
+      },
+      "entitlements": {
+        "com.apple.developer.healthkit": true,
+        "com.apple.developer.healthkit.access": []
       }
     },
     "plugins": [

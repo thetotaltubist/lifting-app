@@ -3,10 +3,11 @@ import { Alert, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useFocusEffect } from 'expo-router';
 import { Badge, Button, Card, Chip, Muted, styles, Title } from '../../components/ui';
-import { DAYS, exercise } from '../../engine/exercises';
-import { deloadSuggestion, Plan, planNext } from '../../engine/plan';
+import { day, exercise } from '../../engine/exercises';
+import { deloadSuggestion, Plan, planNext, rotationFor } from '../../engine/plan';
 import { Session, Settings } from '../../engine/types';
 import { loadActive, loadSessions, loadSettings, saveActive, toDisplay, updateSettings } from '../../storage';
+import { loadHealth, refreshHealth } from '../../health';
 import { colors } from '../../theme';
 
 export default function NextScreen() {
@@ -17,16 +18,17 @@ export default function NextScreen() {
   const [choosing, setChoosing] = useState(false);
 
   const refresh = useCallback(async () => {
-    const [s, all, active] = await Promise.all([loadSettings(), loadSessions(), loadActive()]);
+    const [s, all, active, health] = await Promise.all([loadSettings(), loadSessions(), loadActive(), loadHealth()]);
     setSettings(s);
     setSessions(all);
-    setPlan(planNext(all, s));
+    setPlan(planNext(all, s, new Date(), health));
     setHasActive(!!active);
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      refresh();
+      // Plan right away from saved Health data, then again once it's fresh
+      refresh().then(() => refreshHealth().then(refresh));
     }, [refresh])
   );
 
@@ -145,11 +147,15 @@ export default function NextScreen() {
         </View>
 
         <View style={{ marginTop: 20 }}>
-          {choosing ? (
+          {choosing || sessions.length === 0 ? (
             <>
-              <Muted style={{ marginBottom: 8 }}>Do a different day instead. The rotation carries on from whatever you do.</Muted>
+              <Muted style={{ marginBottom: 8 }}>
+                {sessions.length === 0
+                  ? 'Start with any day you like. The rotation carries on from there.'
+                  : 'Do a different day instead. The rotation carries on from whatever you do.'}
+              </Muted>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                {DAYS.map((d) => (
+                {rotationFor(settings).map((id) => day(id)).map((d) => (
                   <Chip key={d.id} label={d.name} selected={d.id === plan.day.id} onPress={() => chooseDay(d.id)} />
                 ))}
                 {settings.nextDayOverride && <Chip label="Back to the rotation" onPress={() => chooseDay(null)} />}
