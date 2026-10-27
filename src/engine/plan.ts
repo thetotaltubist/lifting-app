@@ -88,15 +88,17 @@ export function rirTarget(kind: 'compound' | 'isolation', week: number, deload: 
   return steps[Math.min(week, steps.length - 1)];
 }
 
-// Split a muscle's sets across its exercises in proportion to base sets
-function distribute(total: number, weights: number[], minSets: number) {
+// Split a muscle's sets across its exercises in proportion to base sets.
+// Compounds get at least 3 working sets and isolation work at least 2, so
+// no exercise is a token 1-2 sets (1 on a deload).
+function distribute(total: number, weights: number[], minSets: number[]) {
   const sum = weights.reduce((a, b) => a + b, 0) || 1;
   const raw = weights.map((w) => (total * w) / sum);
   const out = raw.map((r) => Math.floor(r));
   let left = Math.round(total) - out.reduce((a, b) => a + b, 0);
   const order = raw.map((r, i) => [r - Math.floor(r), i] as const).sort((a, b) => b[0] - a[0]);
   for (let k = 0; left > 0 && order.length; k++, left--) out[order[k % order.length][1]]++;
-  return out.map((n) => Math.max(minSets, Math.min(5, n)));
+  return out.map((n, i) => Math.max(minSets[i], Math.min(5, n)));
 }
 
 export function deloadSuggestion(sessions: Session[], settings: Settings, now: Date): string | null {
@@ -171,7 +173,11 @@ export function planNext(sessions: Session[], settings: Settings, now = new Date
         continue;
       }
       const direct = Math.round(p.total - (credit[m] ?? 0));
-      distribute(direct, idx.map((i) => slots[i].baseSets), deload ? 1 : 2).forEach((n, k) => out.set(String(idx[k]), n));
+      distribute(
+        direct,
+        idx.map((i) => slots[i].baseSets),
+        idx.map((i) => (deload ? 1 : exercise(slots[i].exerciseId).kind === 'compound' ? 3 : 2))
+      ).forEach((n, k) => out.set(String(idx[k]), n));
     }
     return slots.map((_, i) => out.get(String(i)) ?? slots[i].baseSets);
   };

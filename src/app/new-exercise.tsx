@@ -14,7 +14,6 @@ const RANGES: [number, number][] = [
   [12, 20],
 ];
 const STEPS = [2.5, 5, 10];
-const PRESSING: Muscle[] = ['chest', 'frontDelts', 'triceps'];
 
 // Add an exercise or machine the library doesn't have, and use it in place
 // of the exercise you came from.
@@ -26,7 +25,6 @@ export default function NewExerciseScreen() {
   const [kind, setKind] = useState<'compound' | 'isolation'>('isolation');
   const [range, setRange] = useState<[number, number]>([8, 12]);
   const [step, setStep] = useState(5);
-  const [shoulderCheck, setShoulderCheck] = useState(PRESSING.includes(startMuscle));
 
   async function save() {
     if (!name.trim()) {
@@ -40,7 +38,6 @@ export default function NewExerciseScreen() {
       repMax: range[1],
       kind,
       increment: step,
-      shoulderCheck,
     });
     const settings = await loadSettings();
     await updateSettings({
@@ -97,15 +94,6 @@ export default function NewExerciseScreen() {
           {STEPS.map((s) => (
             <Chip key={s} label={String(s)} selected={step === s} onPress={() => setStep(s)} />
           ))}
-        </View>
-      </Card>
-
-      <Card>
-        <Text style={styles.h2}>Shoulder check</Text>
-        <Muted style={{ marginVertical: 6 }}>Ask how your AC joint felt after this exercise.</Muted>
-        <View style={{ flexDirection: 'row' }}>
-          <Chip label="Ask me" selected={shoulderCheck} onPress={() => setShoulderCheck(true)} />
-          <Chip label="Don't ask" selected={!shoulderCheck} onPress={() => setShoulderCheck(false)} />
         </View>
       </Card>
 
