@@ -2,23 +2,23 @@ import { DayTemplate, Exercise, Muscle } from './types';
 
 // ------------------------------------------------------------------
 // Exercise library. No barbell pressing and no dips because of the AC
-// joint. Pressing movements ask about shoulder pain afterward.
+// joint. Every exercise offers an optional pain rating afterward.
 // Secondary muscles get half credit per set (an estimate, not exact).
 // ------------------------------------------------------------------
 
 export const EXERCISES: Exercise[] = [
   // Chest
-  { id: 'pl-incline-press', name: 'Plate-loaded incline press', primary: 'chest', secondary: ['frontDelts', 'triceps'], repMin: 6, repMax: 10, kind: 'compound', increment: 10, shoulderCheck: true, tip: 'Stop the handles an inch above where your shoulder starts to pinch.' },
-  { id: 'pl-flat-press', name: 'Plate-loaded flat press', primary: 'chest', secondary: ['frontDelts', 'triceps'], repMin: 6, repMax: 10, kind: 'compound', increment: 10, shoulderCheck: true },
-  { id: 'db-incline-press', name: 'Incline DB press (neutral grip)', primary: 'chest', secondary: ['frontDelts', 'triceps'], repMin: 8, repMax: 12, kind: 'compound', increment: 5, shoulderCheck: true, tip: 'Palms facing each other is usually easiest on the AC joint.' },
-  { id: 'db-flat-press', name: 'Flat DB press (neutral grip)', primary: 'chest', secondary: ['frontDelts', 'triceps'], repMin: 8, repMax: 12, kind: 'compound', increment: 5, shoulderCheck: true },
-  { id: 'cable-fly', name: 'Cable fly', primary: 'chest', secondary: [], repMin: 10, repMax: 15, kind: 'isolation', increment: 5, shoulderCheck: true, tip: 'Stop when your hands are about shoulder-width apart. Crossing over loads the AC joint.' },
-  { id: 'pec-deck', name: 'Pec deck', primary: 'chest', secondary: [], repMin: 10, repMax: 15, kind: 'isolation', increment: 5, shoulderCheck: true, tip: 'Stop before the handles touch.' },
+  { id: 'pl-incline-press', name: 'Plate-loaded incline press', primary: 'chest', secondary: ['frontDelts', 'triceps'], repMin: 6, repMax: 10, kind: 'compound', increment: 10, tip: 'Stop the handles an inch above where your shoulder starts to pinch.' },
+  { id: 'pl-flat-press', name: 'Plate-loaded flat press', primary: 'chest', secondary: ['frontDelts', 'triceps'], repMin: 6, repMax: 10, kind: 'compound', increment: 10 },
+  { id: 'db-incline-press', name: 'Incline DB press (neutral grip)', primary: 'chest', secondary: ['frontDelts', 'triceps'], repMin: 8, repMax: 12, kind: 'compound', increment: 5, tip: 'Palms facing each other is usually easiest on the AC joint.' },
+  { id: 'db-flat-press', name: 'Flat DB press (neutral grip)', primary: 'chest', secondary: ['frontDelts', 'triceps'], repMin: 8, repMax: 12, kind: 'compound', increment: 5 },
+  { id: 'cable-fly', name: 'Cable fly', primary: 'chest', secondary: [], repMin: 10, repMax: 15, kind: 'isolation', increment: 5, tip: 'Stop when your hands are about shoulder-width apart. Crossing over loads the AC joint.' },
+  { id: 'pec-deck', name: 'Pec deck', primary: 'chest', secondary: [], repMin: 10, repMax: 15, kind: 'isolation', increment: 5, tip: 'Stop before the handles touch.' },
 
   // Shoulders
-  { id: 'machine-shoulder-press', name: 'Shoulder press (machine or plate-loaded)', primary: 'frontDelts', secondary: ['sideDelts', 'triceps'], repMin: 8, repMax: 12, kind: 'compound', increment: 10, shoulderCheck: true },
-  { id: 'db-shoulder-press', name: 'Seated DB shoulder press (neutral grip)', primary: 'frontDelts', secondary: ['sideDelts', 'triceps'], repMin: 8, repMax: 12, kind: 'compound', increment: 5, shoulderCheck: true },
-  { id: 'landmine-press', name: 'Landmine press', primary: 'frontDelts', secondary: ['chest', 'triceps'], repMin: 8, repMax: 12, kind: 'compound', increment: 5, shoulderCheck: true, tip: 'The angled path is often the easiest press for a sore AC joint.' },
+  { id: 'machine-shoulder-press', name: 'Shoulder press (machine or plate-loaded)', primary: 'frontDelts', secondary: ['sideDelts', 'triceps'], repMin: 8, repMax: 12, kind: 'compound', increment: 10 },
+  { id: 'db-shoulder-press', name: 'Seated DB shoulder press (neutral grip)', primary: 'frontDelts', secondary: ['sideDelts', 'triceps'], repMin: 8, repMax: 12, kind: 'compound', increment: 5 },
+  { id: 'landmine-press', name: 'Landmine press', primary: 'frontDelts', secondary: ['chest', 'triceps'], repMin: 8, repMax: 12, kind: 'compound', increment: 5, tip: 'The angled path is often the easiest press for a sore AC joint.' },
   { id: 'db-lateral-raise', name: 'DB lateral raise', primary: 'sideDelts', secondary: [], repMin: 12, repMax: 20, kind: 'isolation', increment: 5 },
   { id: 'cable-lateral-raise', name: 'Cable lateral raise', primary: 'sideDelts', secondary: [], repMin: 12, repMax: 20, kind: 'isolation', increment: 5 },
   { id: 'reverse-pec-deck', name: 'Reverse pec deck', primary: 'rearDelts', secondary: [], repMin: 12, repMax: 20, kind: 'isolation', increment: 5 },
@@ -26,7 +26,7 @@ export const EXERCISES: Exercise[] = [
 
   // Triceps
   { id: 'triceps-pushdown', name: 'Triceps pushdown', primary: 'triceps', secondary: [], repMin: 10, repMax: 15, kind: 'isolation', increment: 5 },
-  { id: 'overhead-cable-ext', name: 'Overhead cable triceps extension', primary: 'triceps', secondary: [], repMin: 10, repMax: 15, kind: 'isolation', increment: 5, shoulderCheck: true },
+  { id: 'overhead-cable-ext', name: 'Overhead cable triceps extension', primary: 'triceps', secondary: [], repMin: 10, repMax: 15, kind: 'isolation', increment: 5 },
   { id: 'single-arm-pushdown', name: 'Single-arm cable pushdown', primary: 'triceps', secondary: [], repMin: 12, repMax: 15, kind: 'isolation', increment: 2.5 },
 
   // Back
@@ -198,3 +198,27 @@ export const MUSCLE_NAMES: Record<Muscle, string> = {
   calves: 'Calves',
   abs: 'Abs',
 };
+
+// Joints each muscle's exercises load, offered when John reports pain
+const JOINTS: Record<Muscle, string[]> = {
+  chest: ['Shoulder', 'Elbow', 'Wrist'],
+  back: ['Shoulder', 'Elbow', 'Lower back'],
+  frontDelts: ['Shoulder', 'Elbow', 'Wrist'],
+  sideDelts: ['Shoulder', 'Elbow'],
+  rearDelts: ['Shoulder'],
+  triceps: ['Elbow', 'Shoulder', 'Wrist'],
+  biceps: ['Elbow', 'Wrist', 'Shoulder'],
+  quads: ['Knee', 'Hip', 'Lower back'],
+  hamstrings: ['Lower back', 'Knee', 'Hip'],
+  glutes: ['Hip', 'Lower back', 'Knee'],
+  calves: ['Ankle', 'Knee'],
+  abs: ['Lower back', 'Hip'],
+};
+
+// Body parts to offer for a pain rating: the joints first, then the muscles
+export function painAreasFor(exerciseId: string): string[] {
+  const e = exercise(exerciseId);
+  const muscles = [e.primary, ...e.secondary];
+  const joints = muscles.flatMap((m) => JOINTS[m]);
+  return [...new Set([...joints, ...muscles.map((m) => MUSCLE_NAMES[m])]), 'Other'];
+}

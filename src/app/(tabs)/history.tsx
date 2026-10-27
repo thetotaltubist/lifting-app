@@ -6,6 +6,7 @@ import { Card, Muted, styles, Title } from '../../components/ui';
 import { day, exercise } from '../../engine/exercises';
 import { Session, Settings } from '../../engine/types';
 import { hardSets } from '../../engine/volume';
+import { painOf } from '../../engine/progression';
 import { deleteSession, loadSessions, loadSettings, toDisplay } from '../../storage';
 import { colors } from '../../theme';
 
@@ -61,9 +62,9 @@ export default function HistoryScreen() {
                       <Muted>
                         {e.sets.map((x) => `${toDisplay(x.weight, settings.unit)}×${x.reps}${x.rir != null ? ` @${x.rir}` : ''}`).join('   ')}
                       </Muted>
-                      {e.shoulderPain != null && (
-                        <Text style={{ color: e.shoulderPain >= 3 ? colors.warn : colors.muted, fontSize: 13 }}>
-                          Shoulder {e.shoulderPain}/10
+                      {painOf(e) > 0 && (
+                        <Text style={{ color: painOf(e) >= 3 ? colors.warn : colors.muted, fontSize: 13 }}>
+                          {e.pain == null ? 'Shoulder' : (e.painArea ?? 'Pain')} {painOf(e)}/10
                         </Text>
                       )}
                     </View>

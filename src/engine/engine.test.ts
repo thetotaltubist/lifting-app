@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { alternativesFor, exercise, makeCustomExercise, setCustomExercises } from './exercises';
+import { alternativesFor, exercise, makeCustomExercise, painAreasFor, setCustomExercises } from './exercises';
 import { planNext, nextDayId, ROTATION } from './plan';
 import { suggest } from './progression';
 import { rollingVolume, weeklyTarget } from './volume';
@@ -35,7 +35,8 @@ function doSession(sessions: Session[], when: Date, reps = 10, pain = 0): Sessio
     exercises: plan.exercises.map((e) => ({
       exerciseId: e.exerciseId,
       sets: Array.from({ length: e.sets }, () => ({ weight: 100, reps, rir: 2, done: true })),
-      shoulderPain: pain,
+      pain,
+      painArea: pain ? 'Shoulder' : null,
     })),
   };
   return [...sessions, s];
@@ -128,7 +129,7 @@ test('double progression adds weight only after the top of the range', () => {
   assert.equal(s.targetReps, 9);
 });
 
-test('shoulder pain holds or lowers pressing weight', () => {
+test('pain holds or lowers the weight', () => {
   const hurt = doSession([], at(0), 10, 6);
   const s = suggest('pl-incline-press', hurt, { comeback: false, deload: false });
   assert.equal(s.weight, 90);
@@ -259,4 +260,14 @@ test('rest suggestions: longer for heavy compounds, shorter for isolation', () =
   assert.equal(restSeconds(exercise('db-lateral-raise'), 2, true), 60);
   assert.equal(formatClock(150), '2:30');
   assert.equal(formatClock(0.2), '0:01');
+});
+
+test('pain offers body parts tied to the lift, and old shoulder logs still count', () => {
+  const areas = painAreasFor('pl-incline-press');
+  assert.equal(areas[0], 'Shoulder');
+  assert.ok(areas.includes('Chest') && areas.includes('Elbow'));
+  assert.ok(painAreasFor('hack-squat').includes('Knee'));
+  const old = doSession([], at(0), 10, 0);
+  old[0].exercises[0] = { ...old[0].exercises[0], pain: undefined, shoulderPain: 6 };
+  assert.equal(suggest('pl-incline-press', old, { comeback: false, deload: false }).weight, 90);
 });
