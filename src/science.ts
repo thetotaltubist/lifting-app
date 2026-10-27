@@ -47,6 +47,12 @@ export const SCIENCE: { title: string; body: string; strength: 'Strong' | 'Moder
       'Muscle grows across a wide range of reps (about 5 to 30) as long as sets are close to failure. The app uses 6 to 12 for presses, rows and squats, and higher reps for isolation work, which is easier on joints.',
   },
   {
+    title: 'Rest between sets',
+    strength: 'Moderate',
+    body:
+      'Resting 2 minutes or more on big lifts lets you keep your reps up, which adds up to more growth than short rest. For isolation work, rest beyond about 90 seconds adds little. The timer suggests 3 minutes for heavy compounds, 2:30 for other compounds and 1:30 for isolation, adding 30 seconds after a set to failure.',
+  },
+  {
     title: 'Progression',
     strength: 'Strong',
     body:
@@ -98,5 +104,7 @@ export const REFERENCES = [
   'Garthe I, Raastad T, Refsnes PE, Koivisto A, Sundgot-Borgen J. Effect of two different weight-loss rates on body composition and strength and power-related performance in elite athletes. Int J Sport Nutr Exerc Metab. 2011;21(2):97-104.',
   'Knowles OE, Drinkwater EJ, Urwin CS, Lamon S, Aisbett B. Inadequate sleep and muscle strength: implications for resistance training. J Sci Med Sport. 2018;21(9):959-968.',
   'Kiviniemi AM, Hautala AJ, Kinnunen H, Tulppo MP. Endurance training guided individually by daily heart rate variability measurements. Eur J Appl Physiol. 2007;101(6):743-751.',
+  'Schoenfeld BJ, Pope ZK, Benik FM, et al. Longer interset rest periods enhance muscle strength and hypertrophy in resistance-trained men. J Strength Cond Res. 2016;30(7):1805-1812.',
+  'Grgic J, Lazinica B, Mikulic P, Krieger JW, Schoenfeld BJ. The effects of short versus long inter-set rest intervals in resistance training on measures of muscle hypertrophy: a systematic review. Eur J Sport Sci. 2017;17(8):983-993.',
   'Morton RW, Murphy KT, McKellar SR, et al. A systematic review, meta-analysis and meta-regression of the effect of protein supplementation on resistance training-induced gains in muscle mass and strength. Br J Sports Med. 2018;52(6):376-384.',
 ];

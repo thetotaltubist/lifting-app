@@ -5,6 +5,7 @@ import { alternativesFor, exercise, makeCustomExercise, setCustomExercises } fro
 import { planNext, nextDayId, ROTATION } from './plan';
 import { suggest } from './progression';
 import { rollingVolume, weeklyTarget } from './volume';
+import { formatClock, restSeconds } from './rest';
 import { HealthData, proteinTarget, shortNightStreak, weightTrend } from './health';
 import { Session, Settings } from './types';
 
@@ -248,4 +249,14 @@ test('your own rotation order, and starting on any day', () => {
   assert.equal(nextDayId(sessions, settings), 'legs-b');
   // A broken order falls back to the default
   assert.equal(nextDayId([], { ...settings, rotation: ['legs-a'] }), 'push-a');
+});
+
+test('rest suggestions: longer for heavy compounds, shorter for isolation', () => {
+  assert.equal(restSeconds(exercise('hack-squat'), 2, false), 180);
+  assert.equal(restSeconds(exercise('lat-pulldown'), 2, false), 150);
+  assert.equal(restSeconds(exercise('db-lateral-raise'), 1, false), 90);
+  assert.equal(restSeconds(exercise('db-lateral-raise'), 0, false), 120);
+  assert.equal(restSeconds(exercise('db-lateral-raise'), 2, true), 60);
+  assert.equal(formatClock(150), '2:30');
+  assert.equal(formatClock(0.2), '0:01');
 });
