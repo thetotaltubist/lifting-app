@@ -1,19 +1,20 @@
 {
   "expo": {
-    "name": "Total Lift",
+    "name": "Mayg & Jaown",
     "slug": "total-lift",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "totallift",
     "userInterfaceStyle": "automatic",
+    "icon": "./assets/icon.png",
     "ios": {
       "bundleIdentifier": "com.jdicesar.totallift",
       "supportsTablet": true,
       "appleTeamId": "7V9S64W92Z",
-      "buildNumber": "3",
+      "buildNumber": "4",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSHealthShareUsageDescription": "Total Lift reads your weight, sleep, HRV and resting heart rate to keep your cut from costing muscle. Nothing is written to Health."
+        "NSHealthShareUsageDescription": "Mayg & Jaown reads your weight, sleep, HRV and resting heart rate to keep your cut from costing muscle. Nothing is written to Health."
       },
       "entitlements": {
         "com.apple.developer.healthkit": true,

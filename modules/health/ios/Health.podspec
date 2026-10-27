@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name           = 'Health'
   s.version        = '1.0.0'
-  s.summary        = 'Reads Apple Health data for Total Lift'
+  s.summary        = 'Reads Apple Health data for Mayg & Jaown'
   s.description    = 'Read-only access to body weight, sleep, HRV and resting heart rate.'
   s.author         = 'John DiCesare'
   s.homepage       = 'https://example.com'

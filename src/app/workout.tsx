@@ -176,7 +176,7 @@ export default function WorkoutScreen() {
     await saveSession(session);
     await updateSettings({ nextDayOverride: null });
     await clearActive();
-    router.back();
+    router.replace('/week-summary');
   }
 
   function discard() {
