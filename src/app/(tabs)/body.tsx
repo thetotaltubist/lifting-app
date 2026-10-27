@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Alert, ScrollView, Text, View } from 'react-native';
+import { Alert, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { Button, Card, Muted, styles, Title } from '../../components/ui';
@@ -22,6 +22,7 @@ export default function BodyScreen() {
   const [health, setHealth] = useState<HealthData | null>(null);
   const [connected, setConnected] = useState<boolean | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
+  const [pulling, setPulling] = useState(false);
 
   const refresh = useCallback(async (force = false) => {
     setSettings(await loadSettings());
@@ -30,11 +31,18 @@ export default function BodyScreen() {
     setHealth(await refreshHealth(force));
   }, []);
 
+  // Always read Health fresh here, so a new weigh-in shows right away
   useFocusEffect(
     useCallback(() => {
-      refresh();
+      refresh(true);
     }, [refresh])
   );
+
+  async function pullToRefresh() {
+    setPulling(true);
+    await refresh(true);
+    setPulling(false);
+  }
 
   async function connect() {
     const ok = await connectHealth();
@@ -88,9 +96,9 @@ export default function BodyScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.screen}>
+      <ScrollView contentContainerStyle={styles.screen} refreshControl={<RefreshControl refreshing={pulling} onRefresh={pullToRefresh} />}>
         <Title>Body</Title>
-        <Muted style={{ marginBottom: 14 }}>From Apple Health.</Muted>
+        <Muted style={{ marginBottom: 14 }}>From Apple Health. Pull down to refresh.</Muted>
 
         <Card style={trend?.fastLoss ? { borderWidth: 2, borderColor: colors.warn } : undefined}>
           <Text style={styles.h2}>Weight</Text>
