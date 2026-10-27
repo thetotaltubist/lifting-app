@@ -236,3 +236,16 @@ test('fast weight loss or short sleep pauses catch-up, never normal sets', () =>
 test('protein target is 1.6-2.2 g per kg', () => {
   assert.deepEqual(proteinTarget(220), { low: 160, high: 220 });
 });
+
+test('your own rotation order, and starting on any day', () => {
+  const mine = { ...settings, rotation: ['legs-a', 'pull-a', 'push-a', 'legs-b', 'pull-b', 'push-b'] };
+  assert.equal(nextDayId([], mine), 'legs-a');
+  let sessions = doSession([], at(0));
+  assert.equal(sessions[0].dayId, 'push-a'); // default settings started on Push A
+  assert.equal(nextDayId(sessions, mine), 'legs-b'); // carries on after Push A in your order
+  // Start somewhere else: the rotation carries on from what you did
+  sessions = [{ ...sessions[0], dayId: 'pull-b' }];
+  assert.equal(nextDayId(sessions, settings), 'legs-b');
+  // A broken order falls back to the default
+  assert.equal(nextDayId([], { ...settings, rotation: ['legs-a'] }), 'push-a');
+});

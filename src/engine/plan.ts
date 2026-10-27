@@ -55,12 +55,20 @@ function sortedSessions(sessions: Session[]) {
   return [...sessions].sort((a, b) => a.finishedAt.localeCompare(b.finishedAt));
 }
 
+// John's own order if he set one, as long as it still has every day once
+export function rotationFor(settings: Settings): string[] {
+  const r = settings.rotation;
+  const valid = r && r.length === ROTATION.length && ROTATION.every((id) => r.includes(id));
+  return valid ? r : ROTATION;
+}
+
 export function nextDayId(sessions: Session[], settings: Settings): string {
-  if (settings.nextDayOverride && ROTATION.includes(settings.nextDayOverride)) return settings.nextDayOverride;
+  const rotation = rotationFor(settings);
+  if (settings.nextDayOverride && rotation.includes(settings.nextDayOverride)) return settings.nextDayOverride;
   const last = sortedSessions(sessions).at(-1);
-  if (!last) return ROTATION[0];
-  const i = ROTATION.indexOf(last.dayId);
-  return ROTATION[(i + 1) % ROTATION.length];
+  if (!last) return rotation[0];
+  const i = rotation.indexOf(last.dayId);
+  return rotation[(i + 1) % rotation.length];
 }
 
 export function blockWeek(settings: Settings, now: Date) {
