@@ -102,7 +102,7 @@ export default function NewExerciseScreen() {
 
       <Card>
         <Text style={styles.h2}>Shoulder check</Text>
-        <Muted style={{ marginVertical: 6 }}>Ask how your AC joint felt after this exercise.</Muted>
+        <Muted style={{ marginVertical: 6 }}>Offer an optional shoulder pain rating after this exercise.</Muted>
         <View style={{ flexDirection: 'row' }}>
           <Chip label="Ask me" selected={shoulderCheck} onPress={() => setShoulderCheck(true)} />
           <Chip label="Don't ask" selected={!shoulderCheck} onPress={() => setShoulderCheck(false)} />

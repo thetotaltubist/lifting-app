@@ -128,33 +128,23 @@ export default function WorkoutScreen() {
       Alert.alert('Nothing logged yet', 'Check off at least one set, or discard the workout.');
       return;
     }
-    const unansweredPain = done.filter((e) => exercise(e.exerciseId).shoulderCheck && e.shoulderPain == null);
-    const save = async () => {
-      const session: Session = {
-        id: `${Date.now()}`,
-        dayId: active!.dayId,
-        startedAt: active!.startedAt,
-        finishedAt: new Date().toISOString(),
-        deload: active!.deload,
-        exercises: done.map((e) => ({ ...e, sets: e.sets.filter((s) => s.done) })),
-      };
-      await saveSession(session);
-      await updateSettings({ nextDayOverride: null });
-      await clearActive();
-      router.back();
+    const session: Session = {
+      id: `${Date.now()}`,
+      dayId: active!.dayId,
+      startedAt: active!.startedAt,
+      finishedAt: new Date().toISOString(),
+      deload: active!.deload,
+      // A skipped shoulder rating means no pain
+      exercises: done.map((e) => ({
+        ...e,
+        sets: e.sets.filter((s) => s.done),
+        shoulderPain: exercise(e.exerciseId).shoulderCheck ? (e.shoulderPain ?? 0) : e.shoulderPain,
+      })),
     };
-    if (unansweredPain.length > 0) {
-      Alert.alert(
-        'Shoulder check',
-        `You didn't rate your shoulder on ${unansweredPain.map((e) => exercise(e.exerciseId).name).join(', ')}. The app uses it to decide whether to add weight.`,
-        [
-          { text: 'Go back', style: 'cancel' },
-          { text: 'Finish anyway', onPress: save },
-        ]
-      );
-    } else {
-      save();
-    }
+    await saveSession(session);
+    await updateSettings({ nextDayOverride: null });
+    await clearActive();
+    router.back();
   }
 
   function discard() {
@@ -259,7 +249,7 @@ export default function WorkoutScreen() {
 
               {e.shoulderCheck && ex.sets.some((s) => s.done) && (
                 <View style={{ marginTop: 14 }}>
-                  <Muted style={{ marginBottom: 6 }}>Left shoulder (AC joint) during this exercise, 0 = none, 10 = worst</Muted>
+                  <Muted style={{ marginBottom: 6 }}>Any shoulder pain? Optional. Skip it if none (10 = worst).</Muted>
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                     {Array.from({ length: 11 }, (_, n) => (
                       <Pressable
