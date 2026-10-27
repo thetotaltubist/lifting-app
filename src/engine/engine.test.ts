@@ -56,11 +56,11 @@ test('rotation goes in order and wraps, with no calendar', () => {
 });
 
 test('targets ramp across the block and cut is lower than build', () => {
-  assert.equal(weeklyTarget('chest', 'cut', 0, false), 8);
-  assert.equal(weeklyTarget('chest', 'cut', 4, false), 12);
-  assert.equal(weeklyTarget('chest', 'cut', 9, false), 12);
+  assert.equal(weeklyTarget('chest', 'cut', 0, false), 10);
+  assert.equal(weeklyTarget('chest', 'cut', 4, false), 14);
+  assert.equal(weeklyTarget('chest', 'cut', 9, false), 14);
   assert.ok(weeklyTarget('back', 'build', 2, false) > weeklyTarget('back', 'cut', 2, false));
-  assert.equal(weeklyTarget('chest', 'cut', 3, true), 4);
+  assert.equal(weeklyTarget('chest', 'cut', 3, true), 5);
 });
 
 test('half credit for secondary muscles', () => {
