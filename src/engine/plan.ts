@@ -1,4 +1,5 @@
 import { DAYS, day, exercise } from './exercises';
+import { catchUpPause, HealthData } from './health';
 import { suggest, Suggestion } from './progression';
 import { DAY_MS, addCredit, creditFor, rollingVolume, weeklyTarget } from './volume';
 import { DayTemplate, Muscle, Session, Settings } from './types';
@@ -15,6 +16,8 @@ import { DayTemplate, Muscle, Session, Settings } from './types';
 //    session. The rest carries to the next time that muscle comes up.
 // 4. After a break of 3+ days the first session back is normal volume,
 //    and catch-up starts the session after.
+// 5. Apple Health can pause catch-up: losing weight too fast, or 3 short
+//    nights in a row (see health.ts).
 // ------------------------------------------------------------------
 
 export const MAX_CATCH_UP = 3;
@@ -107,7 +110,7 @@ export function deloadSuggestion(sessions: Session[], settings: Settings, now: D
     : null;
 }
 
-export function planNext(sessions: Session[], settings: Settings, now = new Date()): Plan {
+export function planNext(sessions: Session[], settings: Settings, now = new Date(), health: HealthData | null = null): Plan {
   const all = sortedSessions(sessions);
   const template = day(nextDayId(all, settings));
   const week = blockWeek(settings, now);
@@ -124,6 +127,7 @@ export function planNext(sessions: Session[], settings: Settings, now = new Date
   );
   const fullWindow = now.getTime() - windowStart >= 7 * DAY_MS;
   const done = rollingVolume(all, now);
+  const pause = catchUpPause(health, now);
 
   const slots = template.exercises.map((x) => ({
     templateExerciseId: x.exerciseId,
@@ -139,7 +143,7 @@ export function planNext(sessions: Session[], settings: Settings, now = new Date
     if (target === 0) continue;
     const dose = target / hitsPerWeek(m);
     let total = dose;
-    if (!comeback && !deload && fullWindow) {
+    if (!comeback && !deload && fullWindow && !pause) {
       const need = target - (done[m] ?? 0);
       const floor = Math.max(2, Math.ceil(dose * 0.6));
       total = Math.min(Math.max(need, floor), dose + MAX_CATCH_UP, MAX_SETS_PER_MUSCLE_SESSION);
@@ -198,6 +202,7 @@ export function planNext(sessions: Session[], settings: Settings, now = new Date
   if (deload) notes.push('Deload week: about half the sets, same weights, 3-4 reps in reserve.');
   if (comeback) notes.push(`${Math.floor(gapDays)} days since your last workout. Today is normal volume. Catch-up sets start next session.`);
   if (!fullWindow && !comeback && !deload) notes.push('Building your first week of history. Catch-up starts once there are 7 days to compare.');
+  if (pause && !comeback && !deload) notes.push(pause);
   const caught = exercises.reduce((t, e) => t + e.catchUpSets, 0);
   if (caught > 0) notes.push(`${caught} catch-up ${caught === 1 ? 'set' : 'sets'} added for muscles that fell behind this week.`);
 

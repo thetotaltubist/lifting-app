@@ -5,6 +5,7 @@ import { alternativesFor, exercise, makeCustomExercise, setCustomExercises } fro
 import { planNext, nextDayId, ROTATION } from './plan';
 import { suggest } from './progression';
 import { rollingVolume, weeklyTarget } from './volume';
+import { HealthData, proteinTarget, shortNightStreak, weightTrend } from './health';
 import { Session, Settings } from './types';
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -180,4 +181,58 @@ test('your own exercise can replace one and counts toward volume', () => {
   };
   assert.equal(rollingVolume([session], at(1)).back, 2);
   setCustomExercises([]);
+});
+
+const iso = (d: Date) => d.toISOString();
+const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+test('weight trend flags losing faster than 1% a week', () => {
+  const now = at(14);
+  const weights = [
+    ...[1, 3, 5, 6].map((d) => ({ date: iso(at(14 - d)), lb: 218 })),
+    ...[8, 10, 12].map((d) => ({ date: iso(at(14 - d)), lb: 221 })),
+  ];
+  const t = weightTrend(weights, now)!;
+  assert.ok(t.pctPerWeek! < -1);
+  assert.ok(t.fastLoss);
+  const slow = weights.map((w) => ({ ...w, lb: w.lb === 221 ? 219 : w.lb }));
+  assert.ok(!weightTrend(slow, now)!.fastLoss);
+  // Too few weigh-ins: no trend yet, so nothing is flagged
+  assert.equal(weightTrend(weights.slice(0, 2), now)!.pctPerWeek, null);
+});
+
+test('three short nights in a row, and missing nights do not count', () => {
+  const now = at(10);
+  const nights = (hours: (number | null)[]) =>
+    hours.flatMap((h, i) => (h == null ? [] : [{ night: ymd(new Date(now.getTime() - i * DAY)), hours: h }]));
+  assert.equal(shortNightStreak(nights([5, 5.5, 4, 8]), now), 3);
+  assert.equal(shortNightStreak(nights([null, 5, 5, 5]), now), 3); // this morning not synced yet
+  assert.equal(shortNightStreak(nights([5, null, 5, 5]), now), 1);
+  assert.equal(shortNightStreak(nights([7, 5, 5, 5]), now), 0);
+});
+
+test('fast weight loss or short sleep pauses catch-up, never normal sets', () => {
+  let sessions: Session[] = [];
+  for (let d = 0; d < 10; d++) sessions = doSession(sessions, at(d));
+  sessions = doSession(sessions, at(15));
+  sessions = doSession(sessions, at(16));
+  const now = at(17);
+  const normal = planNext(sessions, settings, now);
+  assert.ok(normal.exercises.some((e) => e.catchUpSets > 0));
+  const tired: HealthData = {
+    fetchedAt: iso(now),
+    weights: [],
+    sleep: [0, 1, 2].map((i) => ({ night: ymd(new Date(now.getTime() - i * DAY)), hours: 5 })),
+    hrv: [],
+    restingHR: [],
+  };
+  const paused = planNext(sessions, settings, now, tired);
+  assert.equal(paused.exercises.reduce((t, e) => t + e.catchUpSets, 0), 0);
+  assert.ok(paused.notes.some((n) => n.includes('short nights')));
+  // The workout itself is still there
+  assert.ok(paused.exercises.every((e) => e.sets >= 2));
+});
+
+test('protein target is 1.6-2.2 g per kg', () => {
+  assert.deepEqual(proteinTarget(220), { low: 160, high: 220 });
 });

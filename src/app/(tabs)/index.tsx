@@ -7,6 +7,7 @@ import { DAYS, exercise } from '../../engine/exercises';
 import { deloadSuggestion, Plan, planNext } from '../../engine/plan';
 import { Session, Settings } from '../../engine/types';
 import { loadActive, loadSessions, loadSettings, saveActive, toDisplay, updateSettings } from '../../storage';
+import { loadHealth, refreshHealth } from '../../health';
 import { colors } from '../../theme';
 
 export default function NextScreen() {
@@ -17,16 +18,17 @@ export default function NextScreen() {
   const [choosing, setChoosing] = useState(false);
 
   const refresh = useCallback(async () => {
-    const [s, all, active] = await Promise.all([loadSettings(), loadSessions(), loadActive()]);
+    const [s, all, active, health] = await Promise.all([loadSettings(), loadSessions(), loadActive(), loadHealth()]);
     setSettings(s);
     setSessions(all);
-    setPlan(planNext(all, s));
+    setPlan(planNext(all, s, new Date(), health));
     setHasActive(!!active);
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      refresh();
+      // Plan right away from saved Health data, then again once it's fresh
+      refresh().then(() => refreshHealth().then(refresh));
     }, [refresh])
   );
 
