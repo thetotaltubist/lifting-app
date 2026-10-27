@@ -3,6 +3,7 @@ import { Alert, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { Button, Card, Muted, styles, Title } from '../../components/ui';
+import WeightChart from '../../components/WeightChart';
 import {
   baselineCompare,
   FAST_LOSS_PCT,
@@ -12,7 +13,6 @@ import {
   shortNightStreak,
   weightTrend,
 } from '../../engine/health';
-import { DAY_MS } from '../../engine/volume';
 import { connectHealth, healthAvailable, isHealthConnected, loadHealth, refreshHealth } from '../../health';
 import { Settings } from '../../engine/types';
 import { loadSettings, toDisplay } from '../../storage';
@@ -83,17 +83,6 @@ export default function BodyScreen() {
   const hrv = health ? baselineCompare(health.hrv, now) : null;
   const rhr = health ? baselineCompare(health.restingHR, now) : null;
 
-  // Weekly average weight for the last 4 weeks, newest first
-  const weeks = [0, 1, 2, 3].map((w) => {
-    const from = now.getTime() - (w + 1) * 7 * DAY_MS;
-    const to = now.getTime() - w * 7 * DAY_MS;
-    const list = (health?.weights ?? []).filter((x) => {
-      const t = new Date(x.date).getTime();
-      return t > from && t <= to;
-    });
-    return list.length ? list.reduce((a, b) => a + b.lb, 0) / list.length : null;
-  });
-
   const lastNights = [...(health?.sleep ?? [])].sort((a, b) => b.night.localeCompare(a.night)).slice(0, 7);
   const fmt = (n: number | null, digits = 0) => (n == null ? '—' : n.toFixed(digits));
 
@@ -123,14 +112,7 @@ export default function BodyScreen() {
               ) : (
                 <Muted style={{ marginTop: 8 }}>Weigh in at least 3 times a week for two weeks to see your rate of loss.</Muted>
               )}
-              <View style={{ marginTop: 12 }}>
-                {weeks.map((w, i) => (
-                  <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 3 }}>
-                    <Muted>{i === 0 ? 'This week' : i === 1 ? 'Last week' : `${i} weeks ago`}</Muted>
-                    <Text style={styles.body}>{w == null ? '—' : `${toDisplay(Math.round(w * 10) / 10, unit)} ${unit}`}</Text>
-                  </View>
-                ))}
-              </View>
+              <WeightChart weights={health?.weights ?? []} unit={unit} />
             </>
           ) : (
             <Muted style={{ marginTop: 6 }}>No weigh-ins in the last 7 days.</Muted>
