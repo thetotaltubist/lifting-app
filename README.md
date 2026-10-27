@@ -1,4 +1,4 @@
-# Total Lift
+# Mayg & Jaown
 
 John's personal hypertrophy app for iPhone and iPad (Expo, same setup as Total Practice).
 
