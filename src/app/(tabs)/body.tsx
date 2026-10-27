@@ -67,7 +67,7 @@ export default function BodyScreen() {
           <Card>
             <Text style={styles.h2}>Connect Apple Health</Text>
             <Muted style={{ marginVertical: 8 }}>
-              Total Lift reads your weight, sleep, HRV and resting heart rate. Oura and Eight Sleep come in through Health. Nothing is
+              Mayg &amp; Jaown reads your weight, sleep, HRV and resting heart rate. Oura and Eight Sleep come in through Health. Nothing is
               written back, and nothing leaves your phone.
             </Muted>
             <Button title="Connect Apple Health" onPress={connect} />

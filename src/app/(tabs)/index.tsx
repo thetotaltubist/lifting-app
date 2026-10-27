@@ -52,7 +52,8 @@ export default function NextScreen() {
       exercises: plan.exercises.map((e) => ({
         exerciseId: e.exerciseId,
         catchUpSets: e.catchUpSets,
-        shoulderPain: null,
+        pain: null,
+        painArea: null,
         sets: Array.from({ length: e.sets }, () => ({ weight: e.suggestion.weight, reps: null, rir: null, done: false })),
       })),
     });

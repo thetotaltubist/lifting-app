@@ -4,7 +4,7 @@ import { LoggedExercise, Session } from './types';
 // ------------------------------------------------------------------
 // Double progression: keep the weight until every working set reaches
 // the top of the rep range, then add weight and start again at the
-// bottom. Shoulder pain on pressing holds or lowers the weight instead.
+// bottom. Joint or muscle pain holds or lowers the weight instead.
 // ------------------------------------------------------------------
 
 export type Performance = { date: string; ex: LoggedExercise };
@@ -81,24 +81,25 @@ export function suggest(exerciseId: string, sessions: Session[], opts: { comebac
   const weight = mainWeight(last.ex)!;
   const sets = workingSets(last.ex).filter((s) => s.weight === weight);
   const minReps = Math.min(...sets.map((s) => s.reps));
-  const pain = last.ex.shoulderPain ?? 0;
-  const prevPain = history[1]?.ex.shoulderPain ?? 0;
+  const pain = painOf(last.ex);
+  const prevPain = history[1] ? painOf(history[1].ex) : 0;
+  const where = last.ex.painArea && last.ex.painArea !== 'Other' ? last.ex.painArea : 'Pain';
 
-  // Shoulder first: pain decides before progress does
-  if (e.shoulderCheck && pain >= 5) {
+  // Pain first: it decides before progress does
+  if (pain >= 5) {
     return {
       weight: easier(weight, 0.1, e.increment),
       targetReps: e.repMin,
-      why: `Shoulder was ${pain}/10 last time, so the weight drops about 10%. If it still hurts, swap this exercise.`,
+      why: `${where} was ${pain}/10 last time, so the weight drops about 10%. If it still hurts, swap this exercise.`,
       swapSuggested: true,
       stalled: false,
     };
   }
-  if (e.shoulderCheck && pain >= 3) {
+  if (pain >= 3) {
     return {
       weight,
       targetReps: Math.min(minReps, e.repMax),
-      why: `Shoulder was ${pain}/10 last time, so the weight holds until it settles.`,
+      why: `${where} was ${pain}/10 last time, so the weight holds until it settles.`,
       swapSuggested: prevPain >= 3,
       stalled: false,
     };
@@ -146,4 +147,9 @@ export function suggest(exerciseId: string, sessions: Session[], opts: { comebac
     swapSuggested: false,
     stalled,
   };
+}
+
+// Pain rating for a logged exercise; older logs only rated the shoulder
+export function painOf(ex: LoggedExercise) {
+  return ex.pain ?? ex.shoulderPain ?? 0;
 }
