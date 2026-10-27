@@ -1,10 +1,11 @@
 /// <reference types="node" />
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { alternativesFor, exercise, makeCustomExercise, setCustomExercises } from './exercises';
+import { alternativesFor, exercise, makeCustomExercise, painAreasFor, setCustomExercises } from './exercises';
 import { planNext, nextDayId, ROTATION } from './plan';
 import { suggest } from './progression';
 import { rollingVolume, weeklyTarget } from './volume';
+import { formatClock, restSeconds } from './rest';
 import { HealthData, proteinTarget, shortNightStreak, weightTrend } from './health';
 import { Session, Settings } from './types';
 
@@ -34,7 +35,8 @@ function doSession(sessions: Session[], when: Date, reps = 10, pain = 0): Sessio
     exercises: plan.exercises.map((e) => ({
       exerciseId: e.exerciseId,
       sets: Array.from({ length: e.sets }, () => ({ weight: 100, reps, rir: 2, done: true })),
-      shoulderPain: pain,
+      pain,
+      painArea: pain ? 'Shoulder' : null,
     })),
   };
   return [...sessions, s];
@@ -55,11 +57,11 @@ test('rotation goes in order and wraps, with no calendar', () => {
 });
 
 test('targets ramp across the block and cut is lower than build', () => {
-  assert.equal(weeklyTarget('chest', 'cut', 0, false), 8);
-  assert.equal(weeklyTarget('chest', 'cut', 4, false), 12);
-  assert.equal(weeklyTarget('chest', 'cut', 9, false), 12);
+  assert.equal(weeklyTarget('chest', 'cut', 0, false), 10);
+  assert.equal(weeklyTarget('chest', 'cut', 4, false), 14);
+  assert.equal(weeklyTarget('chest', 'cut', 9, false), 14);
   assert.ok(weeklyTarget('back', 'build', 2, false) > weeklyTarget('back', 'cut', 2, false));
-  assert.equal(weeklyTarget('chest', 'cut', 3, true), 4);
+  assert.equal(weeklyTarget('chest', 'cut', 3, true), 5);
 });
 
 test('half credit for secondary muscles', () => {
@@ -127,7 +129,7 @@ test('double progression adds weight only after the top of the range', () => {
   assert.equal(s.targetReps, 9);
 });
 
-test('shoulder pain holds or lowers pressing weight', () => {
+test('pain holds or lowers the weight', () => {
   const hurt = doSession([], at(0), 10, 6);
   const s = suggest('pl-incline-press', hurt, { comeback: false, deload: false });
   assert.equal(s.weight, 90);
@@ -248,4 +250,23 @@ test('your own rotation order, and starting on any day', () => {
   assert.equal(nextDayId(sessions, settings), 'legs-b');
   // A broken order falls back to the default
   assert.equal(nextDayId([], { ...settings, rotation: ['legs-a'] }), 'push-a');
+});
+
+test('rest suggestions: longer for heavy compounds, shorter for isolation', () => {
+  assert.equal(restSeconds(exercise('hack-squat'), 2, false), 180);
+  assert.equal(restSeconds(exercise('lat-pulldown'), 2, false), 150);
+  assert.equal(restSeconds(exercise('db-lateral-raise'), 1, false), 90);
+  assert.equal(restSeconds(exercise('db-lateral-raise'), 0, false), 120);
+  assert.equal(restSeconds(exercise('db-lateral-raise'), 2, true), 60);
+  assert.equal(formatClock(150), '2:30');
+  assert.equal(formatClock(0.2), '0:01');
+});
+
+test('pain offers body parts for the day, and old shoulder logs still count', () => {
+  assert.deepEqual(painAreasFor('push-a'), ['Shoulder', 'Elbow']);
+  assert.deepEqual(painAreasFor('pull-b'), ['Back', 'Elbow']);
+  assert.deepEqual(painAreasFor('legs-a'), ['Glute', 'Knee', 'Calf']);
+  const old = doSession([], at(0), 10, 0);
+  old[0].exercises[0] = { ...old[0].exercises[0], pain: undefined, shoulderPain: 6 };
+  assert.equal(suggest('pl-incline-press', old, { comeback: false, deload: false }).weight, 90);
 });

@@ -6,35 +6,36 @@ import { LoggedExercise, Mode, Muscle, Session } from './types';
 //
 // Ranges are [start of block, peak of block]. Each block starts near the
 // low end and ramps up, so you aren't starting at your maximum volume.
-// Cut ranges sit lower: in a calorie deficit, extra sets buy less muscle
-// and cost more recovery, and about a third of normal volume is enough
-// to keep muscle. See docs/SCIENCE.md.
+// Cut ranges sit a bit lower than build: in a calorie deficit, extra sets
+// buy less muscle and cost more recovery. They still start around 10 sets
+// for the big muscles, well above the minimum needed to keep muscle, since
+// John is an experienced lifter. See science.ts.
 // Front delts have no target of their own; pressing covers them.
 // ------------------------------------------------------------------
 
 export const TARGETS: Record<Mode, Partial<Record<Muscle, [number, number]>>> = {
   cut: {
-    chest: [8, 12],
-    back: [10, 14],
-    sideDelts: [8, 14],
+    chest: [10, 14],
+    back: [12, 16],
+    sideDelts: [10, 16],
     rearDelts: [6, 10],
     triceps: [6, 10],
     biceps: [6, 10],
-    quads: [8, 12],
-    hamstrings: [6, 10],
+    quads: [10, 14],
+    hamstrings: [8, 12],
     glutes: [4, 8],
     calves: [6, 10],
     abs: [4, 8],
   },
   build: {
-    chest: [10, 16],
-    back: [12, 20],
-    sideDelts: [10, 20],
+    chest: [12, 18],
+    back: [14, 20],
+    sideDelts: [12, 20],
     rearDelts: [8, 14],
     triceps: [8, 14],
     biceps: [8, 14],
-    quads: [10, 16],
-    hamstrings: [8, 12],
+    quads: [12, 18],
+    hamstrings: [10, 14],
     glutes: [6, 12],
     calves: [8, 14],
     abs: [6, 10],

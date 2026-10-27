@@ -26,7 +26,7 @@ export type Exercise = {
   repMax: number;
   kind: 'compound' | 'isolation';
   increment: number; // lb added when the top of the rep range is reached
-  shoulderCheck?: boolean; // ask about AC joint pain after this exercise
+  shoulderCheck?: boolean; // no longer used: every exercise asks about pain now
   tip?: string;
 };
 
@@ -47,7 +47,9 @@ export type LoggedExercise = {
   exerciseId: string;
   sets: LoggedSet[];
   catchUpSets?: number;
-  shoulderPain?: number | null; // 0-10, only for shoulderCheck exercises
+  pain?: number | null; // 0-10, joint or muscle pain during this exercise
+  painArea?: string | null; // where it hurt, e.g. 'Shoulder'
+  shoulderPain?: number | null; // older logs, before pain covered any joint or muscle
 };
 
 export type Session = {

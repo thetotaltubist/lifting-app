@@ -3,9 +3,12 @@ import { Alert, KeyboardAvoidingView, Pressable, ScrollView, Text, TextInput, Vi
 import { router } from 'expo-router';
 import { useKeepAwake } from 'expo-keep-awake';
 import * as Haptics from 'expo-haptics';
-import { Badge, Button, Card, Muted, styles } from '../components/ui';
-import { alternativesFor, exercise } from '../engine/exercises';
+import RestTimer, { Rest } from '../components/RestTimer';
+import { Badge, Button, Card, Chip, Muted, styles } from '../components/ui';
+import { alternativesFor, exercise, painAreasFor } from '../engine/exercises';
 import { suggest } from '../engine/progression';
+import { restReason, restSeconds } from '../engine/rest';
+import { cancelRestAlert, scheduleRestAlert } from '../restAlert';
 import { LoggedExercise, LoggedSet, Session, Settings } from '../engine/types';
 import {
   ActiveWorkout,
@@ -28,6 +31,7 @@ export default function WorkoutScreen() {
   const [active, setActive] = useState<ActiveWorkout | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [rest, setRest] = useState<Rest | null>(null);
   const loaded = useRef(false);
 
   useEffect(() => {
@@ -76,6 +80,31 @@ export default function WorkoutScreen() {
         return s;
       }),
     }));
+    if (set.done) return;
+
+    // Start the rest timer for whatever comes next
+    const e = exercise(ex.exerciseId);
+    const nextSet = ex.sets.findIndex((s, k) => k !== j && !s.done);
+    const nextExercise = active!.exercises.find((x, k) => k > i && x.sets.some((s) => !s.done));
+    const next =
+      nextSet >= 0 ? `${e.name}, set ${nextSet + 1}` : nextExercise ? `Next up: ${exercise(nextExercise.exerciseId).name}` : null;
+    if (!next) {
+      stopRest();
+      return;
+    }
+    const seconds = restSeconds(e, set.rir, active!.deload);
+    setRest({ endAt: Date.now() + seconds * 1000, total: seconds, reason: restReason(e, set.rir, active!.deload) });
+    scheduleRestAlert(seconds, next);
+  }
+
+  function stopRest() {
+    setRest(null);
+    cancelRestAlert();
+  }
+
+  function changeRest(r: Rest) {
+    setRest(r);
+    scheduleRestAlert((r.endAt - Date.now()) / 1000, 'Time for your next set');
   }
 
   function addSet(i: number) {
@@ -102,7 +131,8 @@ export default function WorkoutScreen() {
             changeExercise(i, (e) => ({
               ...e,
               exerciseId: o.id,
-              shoulderPain: null,
+              pain: null,
+              painArea: null,
               sets: e.sets.map(() => ({ weight: s.weight, reps: null, rir: null, done: false })),
             }));
           Alert.alert(`Use ${o.name}`, 'Just for today, or every time this slot comes up?', [
@@ -134,17 +164,19 @@ export default function WorkoutScreen() {
       startedAt: active!.startedAt,
       finishedAt: new Date().toISOString(),
       deload: active!.deload,
-      // A skipped shoulder rating means no pain
+      // A skipped pain rating means no pain
       exercises: done.map((e) => ({
         ...e,
         sets: e.sets.filter((s) => s.done),
-        shoulderPain: exercise(e.exerciseId).shoulderCheck ? (e.shoulderPain ?? 0) : e.shoulderPain,
+        pain: e.pain ?? 0,
+        painArea: e.pain ? (e.painArea ?? null) : null,
       })),
     };
+    stopRest();
     await saveSession(session);
     await updateSettings({ nextDayOverride: null });
     await clearActive();
-    router.back();
+    router.replace('/week-summary');
   }
 
   function discard() {
@@ -154,6 +186,7 @@ export default function WorkoutScreen() {
         text: 'Discard',
         style: 'destructive',
         onPress: async () => {
+          stopRest();
           await clearActive();
           router.back();
         },
@@ -247,25 +280,40 @@ export default function WorkoutScreen() {
                 )}
               </View>
 
-              {e.shoulderCheck && ex.sets.some((s) => s.done) && (
+              {ex.sets.some((s) => s.done) && (
                 <View style={{ marginTop: 14 }}>
-                  <Muted style={{ marginBottom: 6 }}>Any shoulder pain? Optional. Skip it if none (10 = worst).</Muted>
+                  <Muted style={{ marginBottom: 6 }}>Any joint or muscle pain? Optional. Skip it if none (10 = worst).</Muted>
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                     {Array.from({ length: 11 }, (_, n) => (
                       <Pressable
                         key={n}
-                        onPress={() => changeExercise(i, (x) => ({ ...x, shoulderPain: n }))}
+                        onPress={() => changeExercise(i, (x) => ({ ...x, pain: n, painArea: n > 0 ? x.painArea : null }))}
                         style={[
                           painChip,
                           {
                             backgroundColor:
-                              ex.shoulderPain === n ? (n >= 5 ? colors.danger : n >= 3 ? colors.warn : colors.good) : colors.chip,
+                              ex.pain === n ? (n >= 5 ? colors.danger : n >= 3 ? colors.warn : colors.good) : colors.chip,
                           },
                         ]}>
-                        <Text style={{ color: ex.shoulderPain === n ? '#FFFFFF' : colors.text, fontWeight: '600' }}>{n}</Text>
+                        <Text style={{ color: ex.pain === n ? '#FFFFFF' : colors.text, fontWeight: '600' }}>{n}</Text>
                       </Pressable>
                     ))}
                   </View>
+                  {!!ex.pain && (
+                    <>
+                      <Muted style={{ marginTop: 10, marginBottom: 6 }}>Where?</Muted>
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                        {painAreasFor(active.dayId).map((a) => (
+                          <Chip
+                            key={a}
+                            label={a}
+                            selected={ex.painArea === a}
+                            onPress={() => changeExercise(i, (x) => ({ ...x, painArea: x.painArea === a ? null : a }))}
+                          />
+                        ))}
+                      </View>
+                    </>
+                  )}
                 </View>
               )}
             </Card>
@@ -277,6 +325,7 @@ export default function WorkoutScreen() {
           <Button title="Discard workout" kind="danger" onPress={discard} />
         </View>
       </ScrollView>
+      {rest && <RestTimer rest={rest} onChange={changeRest} onDone={stopRest} />}
     </KeyboardAvoidingView>
   );
 }
