@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "Total Lift",
+    "slug": "total-lift",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "totallift",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "bundleIdentifier": "com.jdicesar.totallift",
+      "supportsTablet": true,
+      "appleTeamId": "7V9S64W92Z",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F2F1EE",
+          "dark": {
+            "backgroundColor": "#121212"
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
