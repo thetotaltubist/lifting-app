@@ -262,11 +262,10 @@ test('rest suggestions: longer for heavy compounds, shorter for isolation', () =
   assert.equal(formatClock(0.2), '0:01');
 });
 
-test('pain offers body parts tied to the lift, and old shoulder logs still count', () => {
-  const areas = painAreasFor('pl-incline-press');
-  assert.equal(areas[0], 'Shoulder');
-  assert.ok(areas.includes('Chest') && areas.includes('Elbow'));
-  assert.ok(painAreasFor('hack-squat').includes('Knee'));
+test('pain offers body parts for the day, and old shoulder logs still count', () => {
+  assert.deepEqual(painAreasFor('push-a'), ['Shoulder', 'Elbow']);
+  assert.deepEqual(painAreasFor('pull-b'), ['Back', 'Elbow']);
+  assert.deepEqual(painAreasFor('legs-a'), ['Glute', 'Knee', 'Calf']);
   const old = doSession([], at(0), 10, 0);
   old[0].exercises[0] = { ...old[0].exercises[0], pain: undefined, shoulderPain: 6 };
   assert.equal(suggest('pl-incline-press', old, { comeback: false, deload: false }).weight, 90);
