@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setCustomExercises } from './engine/exercises';
 import { DELOAD_DAYS, Plan } from './engine/plan';
 import { DAY_MS } from './engine/volume';
 import { LoggedExercise, Session, Settings } from './engine/types';
@@ -19,6 +20,7 @@ export function defaultSettings(): Settings {
     deloadStart: null,
     lastDeloadEnd: null,
     swaps: {},
+    customExercises: [],
     nextDayOverride: null,
   };
 }
@@ -58,6 +60,7 @@ export async function loadSettings(): Promise<Settings> {
     return fresh;
   }
   const settings = { ...defaultSettings(), ...saved };
+  setCustomExercises(settings.customExercises);
   // A finished deload week starts a fresh block
   if (settings.deloadStart && Date.now() - new Date(settings.deloadStart).getTime() >= DELOAD_DAYS * DAY_MS) {
     const end = new Date(new Date(settings.deloadStart).getTime() + DELOAD_DAYS * DAY_MS).toISOString();
@@ -70,6 +73,7 @@ export async function updateSettings(change: Partial<Settings>) {
   const saved = await read<Partial<Settings> | null>(SETTINGS, null);
   const next = { ...defaultSettings(), ...saved, ...change };
   await write(SETTINGS, next);
+  setCustomExercises(next.customExercises);
   return next;
 }
 

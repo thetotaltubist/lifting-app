@@ -63,17 +63,34 @@ export const EXERCISES: Exercise[] = [
 ];
 
 const byId = new Map(EXERCISES.map((e) => [e.id, e]));
+let custom: Exercise[] = [];
+
+// Exercises John added himself. Called whenever settings load.
+export function setCustomExercises(list: Exercise[]) {
+  for (const e of custom) byId.delete(e.id);
+  custom = list;
+  for (const e of list) byId.set(e.id, e);
+}
+
+export function allExercises(): Exercise[] {
+  return [...EXERCISES, ...custom];
+}
+
+// Anything logged with an exercise that no longer exists still shows up
+const UNKNOWN: Exercise = { id: 'unknown', name: 'Removed exercise', primary: 'chest', secondary: [], repMin: 8, repMax: 12, kind: 'isolation', increment: 5 };
 
 export function exercise(id: string): Exercise {
-  const e = byId.get(id);
-  if (!e) throw new Error(`Unknown exercise ${id}`);
-  return e;
+  return byId.get(id) ?? { ...UNKNOWN, id };
 }
 
 // Swaps keep the same main muscle so the day's volume stays the same
 export function alternativesFor(id: string): Exercise[] {
   const e = exercise(id);
-  return EXERCISES.filter((x) => x.id !== id && x.primary === e.primary);
+  return allExercises().filter((x) => x.id !== id && x.primary === e.primary);
+}
+
+export function makeCustomExercise(fields: Omit<Exercise, 'id' | 'secondary'> & { secondary?: Muscle[] }): Exercise {
+  return { secondary: [], ...fields, id: `custom-${Date.now()}` };
 }
 
 // ------------------------------------------------------------------

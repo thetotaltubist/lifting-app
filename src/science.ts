@@ -59,6 +59,24 @@ export const SCIENCE: { title: string; body: string; strength: 'Strong' | 'Moder
       'A scheduled deload week did not add muscle in a controlled trial, so the app does not force one. It suggests one when several lifts stall or the block runs long, and you decide.',
   },
   {
+    title: 'Rate of weight loss',
+    strength: 'Moderate',
+    body:
+      'Losing about 0.5 to 1% of body weight a week keeps more muscle than losing faster. The Body tab tracks your 7-day average from Apple Health. Above 1% a week, the app tells you to eat more and pauses catch-up sets.',
+  },
+  {
+    title: 'Sleep',
+    strength: 'Moderate',
+    body:
+      'One short night barely affects lifting. Several in a row lower performance and recovery. After 3 nights under 6 hours, the app skips catch-up sets. Your normal workout stays the same.',
+  },
+  {
+    title: 'HRV and resting heart rate',
+    strength: 'Emerging',
+    body:
+      'HRV-guided training mostly helps endurance athletes. For lifting, the studies are few and small, and your own performance is a better guide. The app shows these numbers but never changes your workout because of them.',
+  },
+  {
     title: 'Protein',
     strength: 'Strong',
     body: 'About 1.6 g per kg a day (around 160 g for you) covers most of the benefit, and more is fine. This matters more on tirzepatide, which cuts appetite.',
@@ -76,5 +94,9 @@ export const REFERENCES = [
   'Refalo MC, Helms ER, Trexler ET, Hamilton DL, Fyfe JJ. Influence of resistance training proximity-to-failure on skeletal muscle hypertrophy: a systematic review with meta-analysis. Sports Med. 2023;53(3):649-665.',
   'Schoenfeld BJ, Grgic J, Van Every DW, Plotkin DL. Loading recommendations for muscle strength, hypertrophy, and local endurance: a re-examination of the repetition continuum. Sports. 2021;9(2):32.',
   'Coleman M, Burke R, Augustin F, et al. Gaining more from doing less? The effects of a one-week deload period during supervised resistance training on muscular adaptations. PeerJ. 2024;12:e16777.',
+  'Helms ER, Aragon AA, Fitschen PJ. Evidence-based recommendations for natural bodybuilding contest preparation: nutrition and supplementation. J Int Soc Sports Nutr. 2014;11:20.',
+  'Garthe I, Raastad T, Refsnes PE, Koivisto A, Sundgot-Borgen J. Effect of two different weight-loss rates on body composition and strength and power-related performance in elite athletes. Int J Sport Nutr Exerc Metab. 2011;21(2):97-104.',
+  'Knowles OE, Drinkwater EJ, Urwin CS, Lamon S, Aisbett B. Inadequate sleep and muscle strength: implications for resistance training. J Sci Med Sport. 2018;21(9):959-968.',
+  'Kiviniemi AM, Hautala AJ, Kinnunen H, Tulppo MP. Endurance training guided individually by daily heart rate variability measurements. Eur J Appl Physiol. 2007;101(6):743-751.',
   'Morton RW, Murphy KT, McKellar SR, et al. A systematic review, meta-analysis and meta-regression of the effect of protein supplementation on resistance training-induced gains in muscle mass and strength. Br J Sports Med. 2018;52(6):376-384.',
 ];

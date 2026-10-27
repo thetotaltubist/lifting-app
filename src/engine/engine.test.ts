@@ -1,10 +1,11 @@
 /// <reference types="node" />
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { exercise } from './exercises';
+import { alternativesFor, exercise, makeCustomExercise, setCustomExercises } from './exercises';
 import { planNext, nextDayId, ROTATION } from './plan';
 import { suggest } from './progression';
 import { rollingVolume, weeklyTarget } from './volume';
+import { HealthData, proteinTarget, shortNightStreak, weightTrend } from './health';
 import { Session, Settings } from './types';
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -18,6 +19,7 @@ const settings: Settings = {
   deloadStart: null,
   lastDeloadEnd: null,
   swaps: {},
+  customExercises: [],
   nextDayOverride: null,
 };
 
@@ -150,4 +152,100 @@ test('deload roughly halves the sets', () => {
   const deload = planNext(sessions, { ...settings, deloadStart: at(8).toISOString() }, at(8));
   const sum = (p: typeof normal) => p.exercises.reduce((t, e) => t + e.sets, 0);
   assert.ok(sum(deload) < sum(normal) * 0.75, `${sum(deload)} vs ${sum(normal)}`);
+});
+
+test('a replacement applies on every day and keeps the muscle', () => {
+  const swapped = { ...settings, swaps: { 'pl-incline-press': 'db-incline-press' } };
+  for (const id of ['push-a', 'push-b']) {
+    const plan = planNext([], { ...swapped, nextDayOverride: id }, at(0));
+    const ids = plan.exercises.map((e) => e.exerciseId);
+    assert.ok(ids.includes('db-incline-press'));
+    assert.ok(!ids.includes('pl-incline-press'));
+  }
+});
+
+test('your own exercise can replace one and counts toward volume', () => {
+  const mine = makeCustomExercise({ name: 'Iso-lateral row', primary: 'back', repMin: 8, repMax: 12, kind: 'compound', increment: 10 });
+  setCustomExercises([mine]);
+  const s2 = { ...settings, customExercises: [mine], swaps: { 'cable-row': mine.id }, nextDayOverride: 'pull-a' };
+  const plan = planNext([], s2, at(0));
+  const row = plan.exercises.find((e) => e.exerciseId === mine.id);
+  assert.ok(row);
+  assert.ok(alternativesFor('lat-pulldown').some((e) => e.id === mine.id));
+  const session: Session = {
+    id: 'c',
+    dayId: 'pull-a',
+    startedAt: at(0).toISOString(),
+    finishedAt: at(0).toISOString(),
+    exercises: [{ exerciseId: mine.id, sets: [1, 2].map(() => ({ weight: 100, reps: 10, rir: 2, done: true })) }],
+  };
+  assert.equal(rollingVolume([session], at(1)).back, 2);
+  setCustomExercises([]);
+});
+
+const iso = (d: Date) => d.toISOString();
+const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+test('weight trend flags losing faster than 1% a week', () => {
+  const now = at(14);
+  const weights = [
+    ...[1, 3, 5, 6].map((d) => ({ date: iso(at(14 - d)), lb: 218 })),
+    ...[8, 10, 12].map((d) => ({ date: iso(at(14 - d)), lb: 221 })),
+  ];
+  const t = weightTrend(weights, now)!;
+  assert.ok(t.pctPerWeek! < -1);
+  assert.ok(t.fastLoss);
+  const slow = weights.map((w) => ({ ...w, lb: w.lb === 221 ? 219 : w.lb }));
+  assert.ok(!weightTrend(slow, now)!.fastLoss);
+  // Too few weigh-ins: no trend yet, so nothing is flagged
+  assert.equal(weightTrend(weights.slice(0, 2), now)!.pctPerWeek, null);
+});
+
+test('three short nights in a row, and missing nights do not count', () => {
+  const now = at(10);
+  const nights = (hours: (number | null)[]) =>
+    hours.flatMap((h, i) => (h == null ? [] : [{ night: ymd(new Date(now.getTime() - i * DAY)), hours: h }]));
+  assert.equal(shortNightStreak(nights([5, 5.5, 4, 8]), now), 3);
+  assert.equal(shortNightStreak(nights([null, 5, 5, 5]), now), 3); // this morning not synced yet
+  assert.equal(shortNightStreak(nights([5, null, 5, 5]), now), 1);
+  assert.equal(shortNightStreak(nights([7, 5, 5, 5]), now), 0);
+});
+
+test('fast weight loss or short sleep pauses catch-up, never normal sets', () => {
+  let sessions: Session[] = [];
+  for (let d = 0; d < 10; d++) sessions = doSession(sessions, at(d));
+  sessions = doSession(sessions, at(15));
+  sessions = doSession(sessions, at(16));
+  const now = at(17);
+  const normal = planNext(sessions, settings, now);
+  assert.ok(normal.exercises.some((e) => e.catchUpSets > 0));
+  const tired: HealthData = {
+    fetchedAt: iso(now),
+    weights: [],
+    sleep: [0, 1, 2].map((i) => ({ night: ymd(new Date(now.getTime() - i * DAY)), hours: 5 })),
+    hrv: [],
+    restingHR: [],
+  };
+  const paused = planNext(sessions, settings, now, tired);
+  assert.equal(paused.exercises.reduce((t, e) => t + e.catchUpSets, 0), 0);
+  assert.ok(paused.notes.some((n) => n.includes('short nights')));
+  // The workout itself is still there
+  assert.ok(paused.exercises.every((e) => e.sets >= 2));
+});
+
+test('protein target is 1.6-2.2 g per kg', () => {
+  assert.deepEqual(proteinTarget(220), { low: 160, high: 220 });
+});
+
+test('your own rotation order, and starting on any day', () => {
+  const mine = { ...settings, rotation: ['legs-a', 'pull-a', 'push-a', 'legs-b', 'pull-b', 'push-b'] };
+  assert.equal(nextDayId([], mine), 'legs-a');
+  let sessions = doSession([], at(0));
+  assert.equal(sessions[0].dayId, 'push-a'); // default settings started on Push A
+  assert.equal(nextDayId(sessions, mine), 'legs-b'); // carries on after Push A in your order
+  // Start somewhere else: the rotation carries on from what you did
+  sessions = [{ ...sessions[0], dayId: 'pull-b' }];
+  assert.equal(nextDayId(sessions, settings), 'legs-b');
+  // A broken order falls back to the default
+  assert.equal(nextDayId([], { ...settings, rotation: ['legs-a'] }), 'push-a');
 });
