@@ -14,7 +14,8 @@
       "buildNumber": "5",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSHealthShareUsageDescription": "Mayg & Jaown reads your weight, sleep, HRV and resting heart rate to keep your cut from costing muscle. Nothing is written to Health."
+        "NSHealthShareUsageDescription": "Mayg & Jaown reads your weight, sleep, HRV and resting heart rate to keep your cut from costing muscle. Nothing is written to Health.",
+        "NSHealthUpdateUsageDescription": "Mayg & Jaown never writes to Apple Health. Apple requires this text because the app uses HealthKit."
       },
       "entitlements": {
         "com.apple.developer.healthkit": true,
