@@ -108,10 +108,21 @@ export default function WorkoutScreen() {
   }
 
   function addSet(i: number) {
-    changeExercise(i, (ex) => {
-      const last = ex.sets.at(-1);
-      return { ...ex, sets: [...ex.sets, { weight: last?.weight ?? null, reps: null, rir: null, done: false }] };
-    });
+    const ex = active!.exercises[i];
+    const last = ex.sets.at(-1);
+    changeExercise(i, (x) => ({ ...x, sets: [...x.sets, { weight: last?.weight ?? null, reps: null, rir: null, done: false }] }));
+
+    // Adding a set after checking off the last one means you're resting for it
+    if (!last?.done) return;
+    const next = `${exercise(ex.exerciseId).name}, set ${ex.sets.length + 1}`;
+    if (rest) {
+      scheduleRestAlert((rest.endAt - Date.now()) / 1000, next);
+      return;
+    }
+    const e = exercise(ex.exerciseId);
+    const seconds = restSeconds(e, last.rir, active!.deload);
+    setRest({ endAt: Date.now() + seconds * 1000, total: seconds, reason: restReason(e, last.rir, active!.deload) });
+    scheduleRestAlert(seconds, next);
   }
 
   function removeSet(i: number) {
