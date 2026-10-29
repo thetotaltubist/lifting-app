@@ -26,6 +26,50 @@ import { colors } from '../theme';
 
 const RIR_CHOICES = [0, 1, 2, 3, 4];
 
+// Keeps the typed text (like "27.") while the number is still being entered,
+// so the decimal point doesn't vanish before the next digit.
+function WeightInput({
+  value,
+  unit,
+  onChange,
+  editable,
+}: {
+  value: number | null;
+  unit: Settings['unit'];
+  onChange: (weight: number | null) => void;
+  editable: boolean;
+}) {
+  const [text, setText] = useState(() => toDisplay(value, unit));
+  const [seen, setSeen] = useState({ value, unit });
+
+  // Follow changes made elsewhere, like the weight carried from the last set
+  if (seen.value !== value || seen.unit !== unit) {
+    setSeen({ value, unit });
+    if (seen.unit !== unit || fromDisplay(text, unit) !== value) setText(toDisplay(value, unit));
+  }
+
+  function change(t: string) {
+    // Digits and a single decimal point (a comma counts as one)
+    const clean = t.replace(',', '.').replace(/[^0-9.]/g, '');
+    const [whole, ...rest] = clean.split('.');
+    const next = rest.length ? `${whole}.${rest.join('')}` : whole;
+    setText(next);
+    onChange(fromDisplay(next, unit));
+  }
+
+  return (
+    <TextInput
+      style={[field, { width: 64, marginRight: 6 }]}
+      keyboardType="decimal-pad"
+      value={text}
+      placeholder="—"
+      placeholderTextColor={colors.placeholder}
+      onChangeText={change}
+      editable={editable}
+    />
+  );
+}
+
 export default function WorkoutScreen() {
   useKeepAwake();
   const [active, setActive] = useState<ActiveWorkout | null>(null);
@@ -231,13 +275,10 @@ export default function WorkoutScreen() {
               {ex.sets.map((s, j) => (
                 <View key={j} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8, opacity: s.done ? 0.55 : 1 }}>
                   <Text style={{ width: 26, color: colors.muted, fontWeight: '700' }}>{j + 1}</Text>
-                  <TextInput
-                    style={[field, { width: 64, marginRight: 6 }]}
-                    keyboardType="decimal-pad"
-                    value={toDisplay(s.weight, unit)}
-                    placeholder="—"
-                    placeholderTextColor={colors.placeholder}
-                    onChangeText={(t) => changeSet(i, j, { weight: fromDisplay(t, unit) })}
+                  <WeightInput
+                    value={s.weight}
+                    unit={unit}
+                    onChange={(weight) => changeSet(i, j, { weight })}
                     editable={!s.done}
                   />
                   <TextInput
