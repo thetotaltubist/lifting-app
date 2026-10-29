@@ -9,7 +9,9 @@ import { LoggedExercise, Mode, Muscle, Session } from './types';
 // Cut ranges sit a bit lower than build: in a calorie deficit, extra sets
 // buy less muscle and cost more recovery. They still start around 10 sets
 // for the big muscles, well above the minimum needed to keep muscle, since
-// John is an experienced lifter. See science.ts.
+// John is an experienced lifter. Arms start at 10 too: presses and rows
+// count as half, so a lower target filled up after one push and one pull
+// day. See science.ts.
 // Front delts have no target of their own; pressing covers them.
 // ------------------------------------------------------------------
 
@@ -19,8 +21,8 @@ export const TARGETS: Record<Mode, Partial<Record<Muscle, [number, number]>>> = 
     back: [12, 16],
     sideDelts: [10, 16],
     rearDelts: [6, 10],
-    triceps: [6, 10],
-    biceps: [6, 10],
+    triceps: [10, 14],
+    biceps: [10, 14],
     quads: [10, 14],
     hamstrings: [8, 12],
     glutes: [4, 8],
@@ -29,11 +31,11 @@ export const TARGETS: Record<Mode, Partial<Record<Muscle, [number, number]>>> = 
   },
   build: {
     chest: [12, 18],
-    back: [14, 20],
+    back: [14, 18],
     sideDelts: [12, 20],
     rearDelts: [8, 14],
-    triceps: [8, 14],
-    biceps: [8, 14],
+    triceps: [12, 18],
+    biceps: [12, 18],
     quads: [12, 18],
     hamstrings: [10, 14],
     glutes: [6, 12],

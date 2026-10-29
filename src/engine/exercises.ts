@@ -110,6 +110,7 @@ export const DAYS: DayTemplate[] = [
       { exerciseId: 'machine-shoulder-press', baseSets: 2 },
       { exerciseId: 'db-lateral-raise', baseSets: 3 },
       { exerciseId: 'triceps-pushdown', baseSets: 3 },
+      { exerciseId: 'standing-calf-raise', baseSets: 3 },
     ],
   },
   {
@@ -120,6 +121,7 @@ export const DAYS: DayTemplate[] = [
       { exerciseId: 'lat-pulldown', baseSets: 3 },
       { exerciseId: 'cable-row', baseSets: 3 },
       { exerciseId: 'reverse-pec-deck', baseSets: 3 },
+      { exerciseId: 'cable-lateral-raise', baseSets: 3 },
       { exerciseId: 'preacher-curl', baseSets: 3 },
       { exerciseId: 'db-curl', baseSets: 2 },
     ],
@@ -158,6 +160,7 @@ export const DAYS: DayTemplate[] = [
       { exerciseId: 'neutral-pulldown', baseSets: 3 },
       { exerciseId: 'chest-supported-row', baseSets: 3 },
       { exerciseId: 'face-pull', baseSets: 3 },
+      { exerciseId: 'db-lateral-raise', baseSets: 3 },
       { exerciseId: 'preacher-curl', baseSets: 2 },
       { exerciseId: 'db-curl', baseSets: 3 },
     ],

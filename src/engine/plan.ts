@@ -14,6 +14,11 @@ import { DayTemplate, Muscle, Session, Settings } from './types';
 // 3. If a muscle is behind (missed days), add catch-up sets: at most 3 per
 //    muscle per session, and never more than 10 for one muscle in a
 //    session. The rest carries to the next time that muscle comes up.
+//    A session never drops below the normal dose: sets from a few days
+//    ago leave the 7-day window before the next session, so trimming
+//    to "what's left" made the week settle under target.
+//    Each muscle also gets at least 3 direct sets, so presses and rows
+//    can't crowd out curls and pushdowns.
 // 4. After a break of 3+ days the first session back is normal volume,
 //    and catch-up starts the session after.
 // 5. Apple Health can pause catch-up: losing weight too fast, or 3 short
@@ -22,6 +27,7 @@ import { DayTemplate, Muscle, Session, Settings } from './types';
 
 export const MAX_CATCH_UP = 3;
 export const MAX_SETS_PER_MUSCLE_SESSION = 10;
+export const MIN_DIRECT_SETS = 3;
 export const COMEBACK_GAP_DAYS = 3;
 export const DELOAD_DAYS = 7;
 export const ROTATION = DAYS.map((d) => d.id);
@@ -155,8 +161,7 @@ export function planNext(sessions: Session[], settings: Settings, now = new Date
     let total = dose;
     if (!comeback && !deload && fullWindow && !pause) {
       const need = target - (done[m] ?? 0);
-      const floor = Math.max(2, Math.ceil(dose * 0.6));
-      total = Math.min(Math.max(need, floor), dose + MAX_CATCH_UP, MAX_SETS_PER_MUSCLE_SESSION);
+      total = Math.min(Math.max(need, dose), dose + MAX_CATCH_UP, MAX_SETS_PER_MUSCLE_SESSION);
     }
     plannedFor[m] = { total, catchUp: Math.max(0, Math.round(total - dose)) };
   }
@@ -172,7 +177,7 @@ export function planNext(sessions: Session[], settings: Settings, now = new Date
         idx.forEach((i) => out.set(String(i), sizes[i]));
         continue;
       }
-      const direct = Math.round(p.total - (credit[m] ?? 0));
+      const direct = Math.max(deload ? 0 : MIN_DIRECT_SETS, Math.round(p.total - (credit[m] ?? 0)));
       distribute(
         direct,
         idx.map((i) => slots[i].baseSets),
