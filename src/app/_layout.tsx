@@ -1,24 +1,28 @@
 import { Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { hideSplash } from '../splash';
-import { colors } from '../theme';
+import { colors, hexColors } from '../theme';
 
 export default function RootLayout() {
+  const scheme = useColorScheme() === 'light' ? 'light' : 'dark';
+  const hex = hexColors(scheme);
+
   useEffect(() => {
     hideSplash();
   }, []);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <StatusBar style="auto" />
+      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
           contentStyle: { backgroundColor: colors.bg },
-          headerStyle: { backgroundColor: colors.bg },
-          headerTintColor: colors.accent,
-          headerTitleStyle: { color: colors.text },
+          headerStyle: { backgroundColor: hex.bg },
+          headerTintColor: hex.accent,
+          headerTitleStyle: { color: hex.text },
           headerShadowVisible: false,
         }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
