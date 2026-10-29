@@ -30,5 +30,13 @@ export const colors = {
   danger: dyn('danger'), // delete, pain warnings
 };
 
+// Plain hex for one mode. The native header bar doesn't follow the dynamic
+// colors above (it stayed light in dark mode), so it gets these instead.
+export function hexColors(scheme: 'light' | 'dark') {
+  return Object.fromEntries(
+    Object.entries(palette).map(([name, c]) => [name, c[scheme]])
+  ) as Record<ColorName, string>;
+}
+
 // Plain hex for places that need a string (tab tints, shadows)
 export const accentHex = '#E8590C';
