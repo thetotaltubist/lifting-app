@@ -1,9 +1,15 @@
 import { Stack } from 'expo-router';
+import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { hideSplash } from '../splash';
 import { colors } from '../theme';
 
 export default function RootLayout() {
+  useEffect(() => {
+    hideSplash();
+  }, []);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar style="auto" />
