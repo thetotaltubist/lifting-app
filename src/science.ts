@@ -8,7 +8,7 @@ export const SCIENCE: { title: string; body: string; strength: 'Strong' | 'Moder
     title: 'Weekly sets per muscle',
     strength: 'Strong',
     body:
-      'More weekly hard sets build more muscle, but each extra set adds less than the one before. Around 10+ sets a week per muscle is a good working range for trained lifters. The app ramps each muscle from the low end of its range to the peak over 4 weeks instead of starting at the top.',
+      'More weekly hard sets build more muscle, but each extra set adds less than the one before. Around 10+ sets a week per muscle is a good working range for trained lifters, and gains keep coming past 20 with less from each set. Every muscle with direct work starts its block at 10 or more, including arms. The app ramps each muscle from the low end of its range to the peak over 4 weeks instead of starting at the top.',
   },
   {
     title: 'Holding muscle in a cut',
@@ -20,7 +20,7 @@ export const SCIENCE: { title: string; body: string; strength: 'Strong' | 'Moder
     title: 'Counting helper muscles as half',
     strength: 'Moderate',
     body:
-      'A press works triceps too, but less than a pushdown. Counting each set as half for helper muscles predicts growth better than counting it as zero or as a full set. It is still an estimate.',
+      'A press works triceps too, but less than a pushdown. Counting each set as half for helper muscles predicts growth better than counting it as zero or as a full set. It is still an estimate, so every muscle also gets at least 3 direct sets in each workout that trains it.',
   },
   {
     title: 'How often to train a muscle',

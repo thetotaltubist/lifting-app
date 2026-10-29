@@ -64,6 +64,42 @@ test('targets ramp across the block and cut is lower than build', () => {
   assert.equal(weeklyTarget('chest', 'cut', 3, true), 5);
 });
 
+test('arm targets start at 10 in a cut', () => {
+  assert.equal(weeklyTarget('triceps', 'cut', 0, false), 10);
+  assert.equal(weeklyTarget('biceps', 'build', 4, false), 18);
+});
+
+test('every muscle gets at least 3 direct sets, even with helper credit', () => {
+  for (const id of ['push-a', 'pull-a', 'push-b', 'pull-b']) {
+    const plan = planNext([], { ...settings, nextDayOverride: id }, at(0));
+    const direct = new Map<string, number>();
+    for (const e of plan.exercises) {
+      const m = exercise(e.exerciseId).primary;
+      direct.set(m, (direct.get(m) ?? 0) + e.sets);
+    }
+    for (const [m, n] of direct) if (m !== 'frontDelts') assert.ok(n >= 3, `${id} ${m} ${n}`); // no target of its own
+  }
+});
+
+test('6 days a week reaches every weekly target by the end of the ramp', () => {
+  let sessions: Session[] = [];
+  const short: string[] = [];
+  const counts: Record<string, number[]> = {};
+  for (let d = 0; d < 42; d++) {
+    if (d >= 35) {
+      const v = rollingVolume(sessions, at(d));
+      for (const m of ['chest', 'back', 'sideDelts', 'triceps', 'biceps', 'quads', 'hamstrings', 'calves'] as const)
+        (counts[m] ??= []).push(v[m] ?? 0);
+    }
+    if (d % 7 !== 6) sessions = doSession(sessions, at(d));
+  }
+  for (const [m, vs] of Object.entries(counts)) {
+    const avg = vs.reduce((a, b) => a + b, 0) / vs.length;
+    if (avg < weeklyTarget(m as never, 'cut', 5, false) - 1) short.push(`${m} ${avg.toFixed(1)}`);
+  }
+  assert.deepEqual(short, []);
+});
+
 test('half credit for secondary muscles', () => {
   const s: Session = {
     id: 'x',
