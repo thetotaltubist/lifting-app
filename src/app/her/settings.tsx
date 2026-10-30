@@ -89,7 +89,7 @@ export default function HerSettingsScreen() {
           <Button title="Restart the 6 weeks" kind="plain" onPress={restart} />
         </Card>
 
-        <Muted>{"Your workouts are saved on this phone, separate from John's."}</Muted>
+        <Muted>{"Your workouts are saved on this phone, separate from Jaown & Mayg's."}</Muted>
       </ScrollView>
     </SafeAreaView>
   );

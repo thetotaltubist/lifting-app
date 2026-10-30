@@ -78,7 +78,7 @@ export default function HerBodyScreen() {
               phone.
             </Muted>
             <Muted style={{ marginBottom: 12 }}>
-              Apple Health only has the data of whoever owns this phone, so connect on your own iPhone. On John&apos;s phone it would show his.
+              Apple Health only has the data of whoever owns this phone, so connect on your own iPhone. On Jaown&apos;s phone it would show his.
             </Muted>
             <Button title="Connect Apple Health" onPress={connect} />
           </Card>

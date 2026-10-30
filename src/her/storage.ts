@@ -13,7 +13,7 @@ const ACTIVE = 'her:active-workout';
 
 export function defaultHerSettings(): HerSettings {
   const now = new Date().toISOString();
-  return { name: 'Mayg', programStart: now, round: 1, level: 1, levelSince: now, nextOverride: null, gymDays: [0, 6] };
+  return { name: 'Mandy', programStart: now, round: 1, level: 1, levelSince: now, nextOverride: null, gymDays: [0, 6] };
 }
 
 async function read<T>(key: string, fallback: T): Promise<T> {

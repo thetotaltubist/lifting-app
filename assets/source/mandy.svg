@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" rx="200" fill="#121212"/>
+  <!-- hair, back layer -->
+  <path d="M250 470 C230 250 360 120 512 120 C664 120 794 250 774 470 C790 600 800 690 760 760 L264 760 C224 690 234 600 250 470 Z" fill="#B8401F"/>
+  <!-- neck -->
+  <rect x="452" y="640" width="120" height="110" rx="30" fill="#E9B08C"/>
+  <!-- face -->
+  <ellipse cx="512" cy="460" rx="200" ry="235" fill="#F3C9A8"/>
+  <!-- bangs / side part -->
+  <path d="M300 420 C300 250 420 190 520 190 C640 190 730 260 730 400 C690 330 610 290 520 300 C470 330 400 370 300 420 Z" fill="#C9502A"/>
+  <path d="M520 190 C600 200 700 250 730 400 C700 340 640 300 560 290 Z" fill="#D8643A" opacity="0.6"/>
+  <!-- side hair strands over shoulders -->
+  <path d="M312 420 C290 520 300 640 330 740 L270 740 C250 640 255 520 290 430 Z" fill="#C9502A"/>
+  <path d="M712 420 C734 520 724 640 694 740 L754 740 C774 640 769 520 734 430 Z" fill="#C9502A"/>
+  <!-- brows -->
+  <path d="M400 405 Q440 390 478 402" stroke="#8A3518" stroke-width="16" fill="none" stroke-linecap="round"/>
+  <path d="M546 402 Q584 390 624 405" stroke="#8A3518" stroke-width="16" fill="none" stroke-linecap="round"/>
+  <!-- eyes -->
+  <ellipse cx="440" cy="452" rx="20" ry="22" fill="#1B1B1D"/>
+  <ellipse cx="584" cy="452" rx="20" ry="22" fill="#1B1B1D"/>
+  <path d="M414 436 L404 426 M466 436 L476 428" stroke="#1B1B1D" stroke-width="7" stroke-linecap="round"/>
+  <path d="M558 436 L548 428 M610 436 L620 426" stroke="#1B1B1D" stroke-width="7" stroke-linecap="round"/>
+  <!-- freckles + cheeks -->
+  <ellipse cx="402" cy="530" rx="38" ry="20" fill="#EE9C93" opacity="0.55"/>
+  <ellipse cx="622" cy="530" rx="38" ry="20" fill="#EE9C93" opacity="0.55"/>
+  <g fill="#C87A55"><circle cx="470" cy="512" r="5"/><circle cx="488" cy="500" r="4"/><circle cx="455" cy="498" r="4"/><circle cx="554" cy="512" r="5"/><circle cx="536" cy="500" r="4"/><circle cx="569" cy="498" r="4"/></g>
+  <!-- nose -->
+  <path d="M512 470 L500 528 L522 528" stroke="#D89A78" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- smile -->
+  <path d="M450 580 Q512 630 574 580 Q512 600 450 580 Z" fill="#FFFFFF" stroke="#A8325A" stroke-width="12" stroke-linejoin="round"/>
+  <!-- shirt -->
+  <path d="M300 760 C320 700 400 690 452 700 L572 700 C624 690 704 700 724 760 Z" fill="#C2477A"/>
+  <!-- dumbbells -->
+  <g>
+    <rect x="96" y="800" width="60" height="150" rx="18" fill="#F07AA6"/>
+    <rect x="166" y="820" width="40" height="110" rx="14" fill="#F07AA6"/>
+    <rect x="200" y="860" width="140" height="30" fill="#A3A2A8"/>
+    <rect x="334" y="820" width="40" height="110" rx="14" fill="#F07AA6"/>
+    <rect x="384" y="800" width="60" height="150" rx="18" fill="#F07AA6"/>
+  </g>
+  <g transform="translate(484 0)">
+    <rect x="96" y="800" width="60" height="150" rx="18" fill="#F07AA6"/>
+    <rect x="166" y="820" width="40" height="110" rx="14" fill="#F07AA6"/>
+    <rect x="200" y="860" width="140" height="30" fill="#A3A2A8"/>
+    <rect x="334" y="820" width="40" height="110" rx="14" fill="#F07AA6"/>
+    <rect x="384" y="800" width="60" height="150" rx="18" fill="#F07AA6"/>
+  </g>
+</svg>

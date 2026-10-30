@@ -6,7 +6,7 @@ import { Person, savePerson } from '../person';
 import { loadHerSettings } from '../her/storage';
 import { themeColors } from '../theme';
 
-// The John / her toggle at the top of both sides of the app
+// The Jaown & Mayg / Mandy toggle at the top of both sides of the app
 export default function PersonSwitch({ current }: { current: Person }) {
   const [herName, setHerName] = useState('');
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function PersonSwitch({ current }: { current: Person }) {
             onPress={() => pick(p)}
             hitSlop={4}
             style={{ backgroundColor: on ? colors.accent : 'transparent', borderRadius: 15, paddingVertical: 6, paddingHorizontal: 16 }}>
-            <Text style={{ color: on ? '#FFFFFF' : colors.text, fontWeight: '700', fontSize: 14 }}>{p === 'john' ? 'John' : herName || ' '}</Text>
+            <Text style={{ color: on ? '#FFFFFF' : colors.text, fontWeight: '700', fontSize: 14 }}>{p === 'john' ? 'Jaown & Mayg' : herName || ' '}</Text>
           </Pressable>
         );
       })}

@@ -14,9 +14,9 @@ John's personal hypertrophy app for iPhone and iPad (Expo, same setup as Total P
 - **Rest timer.** Checking off a set starts a countdown with a suggested rest (3:00 heavy compounds, 2:30 compounds, 1:30 isolation, +30s after a set to failure) and a notification when it's up.
 - "How the plan works" in the app lists the research behind each rule.
 
-## Her side
+## Aunt Mandy's side
 
-The John / Mayg switch at the top of the Next and Settings screens flips the whole app to her own program, with her own data (stored under separate keys, so John's history is never touched). The app opens to whoever used it last.
+The Jaown & Mayg / Mandy switch at the top of the Next and Settings screens flips the whole app to Aunt Mandy's own program (pink theme, her own Body tab with her Apple Health), with her own data (stored under separate keys, so John's history is never touched). The app opens to whoever used it last.
 
 - **5 workouts in order:** Upper Body Strength + Cardio, Lower Body + Glutes, Cardio + Core, Total Body Strength Endurance, Cardio Strength Circuit. High-rep dumbbell circuits (12-20 reps) with low-impact cardio intervals, warm-up and cooldown.
 - **Guided like a class:** one move at a time, timers for cardio, holds and rests run on their own.
