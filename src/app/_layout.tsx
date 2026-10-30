@@ -25,12 +25,14 @@ export default function RootLayout() {
           headerTitleStyle: { color: hex.text },
           headerShadowVisible: false,
         }}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false, animation: 'fade' }} />
         <Stack.Screen name="workout" options={{ title: 'Workout', gestureEnabled: false, headerBackVisible: false }} />
         <Stack.Screen name="science" options={{ title: 'How the plan works' }} />
         <Stack.Screen name="program" options={{ title: 'Exercises' }} />
         <Stack.Screen name="new-exercise" options={{ title: 'Add your own', presentation: 'modal' }} />
         <Stack.Screen name="week-summary" options={{ title: 'This week', presentation: 'modal' }} />
+        <Stack.Screen name="her" options={{ headerShown: false, animation: 'fade' }} />
+        <Stack.Screen name="her-workout" options={{ title: 'Workout', gestureEnabled: false, headerBackVisible: false }} />
       </Stack>
     </GestureHandlerRootView>
   );

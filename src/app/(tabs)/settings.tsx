@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Alert, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import PersonSwitch from '../../components/PersonSwitch';
 import { router, useFocusEffect } from 'expo-router';
 import { Button, Card, Chip, Muted, styles, Title } from '../../components/ui';
 import { day } from '../../engine/exercises';
@@ -48,6 +49,7 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top']}>
       <ScrollView contentContainerStyle={styles.screen}>
+        <PersonSwitch current="john" />
         <Title>Settings</Title>
 
         <Card>
