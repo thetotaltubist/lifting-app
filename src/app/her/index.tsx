@@ -20,7 +20,7 @@ import {
 import { move, ROTATION, SAFETY, workout, WORKOUTS } from '../../her/program';
 import { clearHerActive, loadHerActive, loadHerSessions, loadHerSettings, saveHerActive, updateHerSettings } from '../../her/storage';
 import { HerSession, HerSettings, Level } from '../../her/types';
-import { colors } from '../../theme';
+import { herColors as colors } from '../../theme';
 import { HealthData, shortNightStreak, SHORT_NIGHTS_IN_A_ROW } from '../../engine/health';
 import { loadHealth, refreshHealth } from '../../health';
 

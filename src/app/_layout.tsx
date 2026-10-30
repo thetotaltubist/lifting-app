@@ -4,11 +4,12 @@ import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { hideSplash } from '../splash';
-import { colors, hexColors } from '../theme';
+import { colors, hexColors, herColors } from '../theme';
 
 export default function RootLayout() {
   const scheme = useColorScheme() === 'light' ? 'light' : 'dark';
-  const hex = hexColors(scheme);
+  const hex = hexColors(scheme, 'john');
+  const herHex = hexColors(scheme, 'her');
 
   useEffect(() => {
     hideSplash();
@@ -32,7 +33,18 @@ export default function RootLayout() {
         <Stack.Screen name="new-exercise" options={{ title: 'Add your own', presentation: 'modal' }} />
         <Stack.Screen name="week-summary" options={{ title: 'This week', presentation: 'modal' }} />
         <Stack.Screen name="her" options={{ headerShown: false, animation: 'fade' }} />
-        <Stack.Screen name="her-workout" options={{ title: 'Workout', gestureEnabled: false, headerBackVisible: false }} />
+        <Stack.Screen
+          name="her-workout"
+          options={{
+            title: 'Workout',
+            gestureEnabled: false,
+            headerBackVisible: false,
+            headerStyle: { backgroundColor: herHex.bg },
+            headerTintColor: herHex.accent,
+            headerTitleStyle: { color: herHex.text },
+            contentStyle: { backgroundColor: herColors.bg },
+          }}
+        />
       </Stack>
     </GestureHandlerRootView>
   );

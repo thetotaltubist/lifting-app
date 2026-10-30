@@ -14,7 +14,7 @@ import {
   weightTrend,
 } from '../../engine/health';
 import { connectHealth, healthAvailable, isHealthConnected, loadHealth, refreshHealth } from '../../health';
-import { colors } from '../../theme';
+import { herColors as colors } from '../../theme';
 
 const unit = 'lb';
 

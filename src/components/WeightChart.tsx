@@ -2,8 +2,7 @@ import { useMemo, useState } from 'react';
 import { Text, useColorScheme, View } from 'react-native';
 import Svg, { Circle, Line, Path } from 'react-native-svg';
 import { DAY_MS } from '../engine/volume';
-import { colors } from '../theme';
-import palette from '../../theme-colors.json';
+import { activeTheme, hexColors, themeColors } from '../theme';
 import { Chip, Muted } from './ui';
 
 // ------------------------------------------------------------------
@@ -103,8 +102,10 @@ export default function WeightChart({ weights, unit }: { weights: { date: string
   });
   const lastAvgIndex = points.map((p) => p.avg != null).lastIndexOf(true);
 
-  const surface = palette.card[scheme];
-  const grid = palette.border[scheme];
+  const colors = themeColors();
+  const surface = hexColors(scheme).card;
+  const grid = hexColors(scheme).border;
+  const line = activeTheme() === 'her' ? hexColors(scheme).accent : LINE[scheme];
   const fmtDate = (t: number) => new Date(t).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   const fmt = (v: number | null) => (v == null ? '—' : `${v.toFixed(1)} ${unit}`);
   const a = active != null ? points[active] : null;
@@ -116,7 +117,7 @@ export default function WeightChart({ weights, unit }: { weights: { date: string
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: DOT[scheme], marginRight: 5 }} />
           <Muted style={{ fontSize: 12, marginRight: 12 }}>Weigh-in</Muted>
-          <View style={{ width: 14, height: 2, borderRadius: 1, backgroundColor: LINE[scheme], marginRight: 5 }} />
+          <View style={{ width: 14, height: 2, borderRadius: 1, backgroundColor: line, marginRight: 5 }} />
           <Muted style={{ fontSize: 12 }}>7-day average</Muted>
         </View>
         <View style={{ flexDirection: 'row', marginBottom: -8 }}>
@@ -145,11 +146,11 @@ export default function WeightChart({ weights, unit }: { weights: { date: string
                 <Circle key={p.t} cx={x(i)} cy={y(p.day)} r={4} fill={DOT[scheme]} stroke={surface} strokeWidth={2} />
               )
             )}
-            <Path d={path} stroke={LINE[scheme]} strokeWidth={2} fill="none" strokeLinejoin="round" strokeLinecap="round" />
+            <Path d={path} stroke={line} strokeWidth={2} fill="none" strokeLinejoin="round" strokeLinecap="round" />
             {lastAvgIndex >= 0 && (
-              <Circle cx={x(lastAvgIndex)} cy={y(points[lastAvgIndex].avg!)} r={4.5} fill={LINE[scheme]} stroke={surface} strokeWidth={2} />
+              <Circle cx={x(lastAvgIndex)} cy={y(points[lastAvgIndex].avg!)} r={4.5} fill={line} stroke={surface} strokeWidth={2} />
             )}
-            {a && <Line x1={x(active!)} x2={x(active!)} y1={TOP} y2={TOP + plotH} stroke={palette.muted[scheme]} strokeWidth={1} />}
+            {a && <Line x1={x(active!)} x2={x(active!)} y1={TOP} y2={TOP + plotH} stroke={hexColors(scheme).muted} strokeWidth={1} />}
           </Svg>
         )}
         {/* Axis labels as text so they use the app's text colors */}

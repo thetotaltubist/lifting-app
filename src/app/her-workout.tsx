@@ -9,7 +9,7 @@ import { DUMBBELLS, move, workout } from '../her/program';
 import { clearHerActive, HerActive, loadHerActive, saveHerActive, saveHerSession, updateHerSettings } from '../her/storage';
 import { CheckIn, Effort, Form, HerSession, Recovery, Symptoms } from '../her/types';
 import { formatClock } from '../engine/rest';
-import { colors } from '../theme';
+import { herColors as colors } from '../theme';
 
 const EFFORT: [Effort, string][] = [
   ['easy', 'Easy'],

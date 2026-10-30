@@ -7,7 +7,7 @@ import { moveName } from '../../her/engine';
 import { move, workout } from '../../her/program';
 import { deleteHerSession, loadHerSessions } from '../../her/storage';
 import { HerSession, MoveLog } from '../../her/types';
-import { colors } from '../../theme';
+import { herColors as colors } from '../../theme';
 
 const EFFORT = { easy: 'Easy', right: 'About right', hard: 'Hard', tooHard: 'Too hard' };
 

@@ -7,7 +7,7 @@ import { Button, Card, Chip, Muted, styles, Title } from '../../components/ui';
 import { LEVELS, PROGRAM_WEEKS, programWeek } from '../../her/engine';
 import { loadHerSettings, updateHerSettings } from '../../her/storage';
 import { HerSettings, Level } from '../../her/types';
-import { colors } from '../../theme';
+import { herColors as colors } from '../../theme';
 
 const DAY_LETTERS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 

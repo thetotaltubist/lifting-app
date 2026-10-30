@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setActiveTheme } from './theme';
 
 // ------------------------------------------------------------------
 // Whose side of the app is showing. The app opens to whoever used it last.
@@ -16,10 +17,12 @@ export async function loadPerson(): Promise<Person> {
   } catch {
     current = 'john';
   }
+  setActiveTheme(current);
   return current;
 }
 
 export async function savePerson(p: Person) {
   current = p;
+  setActiveTheme(p);
   await AsyncStorage.setItem(KEY, p).catch(() => {});
 }

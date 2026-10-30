@@ -5,7 +5,7 @@ import { Badge, Card, Muted, styles, Title } from '../../components/ui';
 import { COOLDOWN_SECONDS, LEVELS, PROGRAM_WEEKS, WARMUP_SECONDS } from '../../her/engine';
 import { DUMBBELLS, move, SAFETY, WORKOUTS } from '../../her/program';
 import { Circuit, Level } from '../../her/types';
-import { colors } from '../../theme';
+import { herColors as colors } from '../../theme';
 
 // The whole six-week plan in one place: every workout, move, weight,
 // interval and easier version, plus how it gets harder.

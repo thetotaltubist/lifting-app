@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Person, savePerson } from '../person';
 import { loadHerSettings } from '../her/storage';
-import { colors } from '../theme';
+import { themeColors } from '../theme';
 
 // The John / her toggle at the top of both sides of the app
 export default function PersonSwitch({ current }: { current: Person }) {
@@ -12,6 +12,8 @@ export default function PersonSwitch({ current }: { current: Person }) {
   useEffect(() => {
     loadHerSettings().then((s) => setHerName(s.name));
   }, []);
+
+  const colors = themeColors();
 
   async function pick(p: Person) {
     if (p === current) return;

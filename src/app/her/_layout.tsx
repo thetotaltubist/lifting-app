@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
-import { accentHex, colors } from '../../theme';
+import { herAccentHex as accentHex, herColors as colors } from '../../theme';
 
 const mist = '#A9A7A1';
 
