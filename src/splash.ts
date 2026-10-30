@@ -7,7 +7,7 @@ import * as SplashScreen from 'expo-splash-screen';
 // Later opens that day (like coming back between sets) skip the wait.
 // ------------------------------------------------------------------
 
-export const SPLASH_HOLD_MS = 2000;
+export const SPLASH_HOLD_MS = 4000;
 
 const LAST_SHOWN = 'splash-last-shown';
 const startedAt = Date.now();

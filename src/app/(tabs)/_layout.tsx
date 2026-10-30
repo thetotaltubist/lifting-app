@@ -1,5 +1,7 @@
-import { Tabs } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Redirect, Tabs } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
+import { loadPerson, Person } from '../../person';
 import { accentHex, colors } from '../../theme';
 
 const mist = '#A9A7A1';
@@ -9,6 +11,14 @@ function TabSymbol({ outline, filled, color, focused }: { outline: string; fille
 }
 
 export default function TabLayout() {
+  // Open to her side if she used the app last
+  const [person, setPerson] = useState<Person | null>(null);
+  useEffect(() => {
+    loadPerson().then(setPerson);
+  }, []);
+  if (!person) return null;
+  if (person === 'her') return <Redirect href="/her" />;
+
   return (
     <Tabs
       screenOptions={{
