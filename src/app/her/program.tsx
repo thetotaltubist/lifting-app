@@ -3,7 +3,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Badge, Card, Muted, styles, Title } from '../../components/ui';
 import { COOLDOWN_SECONDS, LEVELS, PROGRAM_WEEKS, WARMUP_SECONDS } from '../../her/engine';
-import { DUMBBELLS, move, SAFETY, WORKOUTS } from '../../her/program';
+import { DUMBBELLS, move, WORKOUTS } from '../../her/program';
 import { Circuit, Level } from '../../her/types';
 import { herColors as colors } from '../../theme';
 
@@ -83,10 +83,6 @@ export default function HerProgramScreen() {
           <Muted style={{ marginTop: 8 }}>
             Neck stays long and neutral, with your eyes on the floor a few feet ahead when you hinge. Nothing heavy overhead (8 lb max for presses). No jumping, no burpees, no quick moves from the floor to standing. Mat work is grouped together so you get down and up once, slowly. Breathe out on the effort and never hold your breath. Every move has an easier version.
           </Muted>
-        </Card>
-
-        <Card style={{ backgroundColor: colors.accentSoft }}>
-          <Text style={styles.body}>{SAFETY}</Text>
         </Card>
       </ScrollView>
     </SafeAreaView>

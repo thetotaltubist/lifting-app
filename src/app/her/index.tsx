@@ -17,7 +17,7 @@ import {
   programWeek,
   Step,
 } from '../../her/engine';
-import { move, ROTATION, SAFETY, workout, WORKOUTS } from '../../her/program';
+import { move, ROTATION, workout, WORKOUTS } from '../../her/program';
 import { clearHerActive, loadHerActive, loadHerSessions, loadHerSettings, saveHerActive, updateHerSettings } from '../../her/storage';
 import { HerSession, HerSettings, Level } from '../../her/types';
 import { herColors as colors } from '../../theme';
@@ -154,10 +154,6 @@ export default function HerTodayScreen() {
             </Text>
           </Card>
         )}
-
-        <Card style={{ backgroundColor: colors.accentSoft }}>
-          <Text style={styles.body}>{SAFETY}</Text>
-        </Card>
 
         {sections.map((sec, i) => (
           <Card key={`${sec.title}${i}`}>

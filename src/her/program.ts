@@ -213,6 +213,3 @@ export const ROTATION = WORKOUTS.map((w) => w.id);
 export function workout(id: string): Workout {
   return WORKOUTS.find((w) => w.id === id) ?? WORKOUTS[0];
 }
-
-export const SAFETY =
-  'Stop and sit down if you get a headache, neck pain, dizziness, vision changes, or numbness or tingling. Use the easier version or skip the move. If a symptom is new, strong, or doesn\'t settle with rest, stop the workout and call your surgeon.';
