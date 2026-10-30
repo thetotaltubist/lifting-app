@@ -21,6 +21,8 @@ import { move, ROTATION, SAFETY, workout, WORKOUTS } from '../../her/program';
 import { clearHerActive, loadHerActive, loadHerSessions, loadHerSettings, saveHerActive, updateHerSettings } from '../../her/storage';
 import { HerSession, HerSettings, Level } from '../../her/types';
 import { colors } from '../../theme';
+import { HealthData, shortNightStreak, SHORT_NIGHTS_IN_A_ROW } from '../../engine/health';
+import { loadHealth, refreshHealth } from '../../health';
 
 export default function HerTodayScreen() {
   const [settings, setSettings] = useState<HerSettings | null>(null);
@@ -28,6 +30,7 @@ export default function HerTodayScreen() {
   const [hasActive, setHasActive] = useState(false);
   const [gym, setGym] = useState<boolean | null>(null);
   const [choosing, setChoosing] = useState(false);
+  const [health, setHealth] = useState<HealthData | null>(null);
 
   const refresh = useCallback(async () => {
     const [s, all, active] = await Promise.all([loadHerSettings(), loadHerSessions(), loadHerActive()]);
@@ -38,6 +41,8 @@ export default function HerTodayScreen() {
   useFocusEffect(
     useCallback(() => {
       refresh();
+      loadHealth('her').then(setHealth);
+      refreshHealth(false, 'her').then(setHealth);
     }, [refresh])
   );
 
@@ -49,6 +54,7 @@ export default function HerTodayScreen() {
   const steps = buildSteps(w, settings.level, week, atGym, sessions);
   const advice = levelAdvice(sessions, settings);
   const spec = LEVELS[settings.level];
+  const shortNights = health ? shortNightStreak(health.sleep, now) : 0;
 
   async function change(c: Partial<HerSettings>) {
     setSettings(await updateHerSettings(c));
@@ -140,6 +146,14 @@ export default function HerTodayScreen() {
           </View>
           {atGym && <Muted>Moves with a machine or cable version use it today. {w.gymNote ?? ''}</Muted>}
         </Card>
+
+        {shortNights >= SHORT_NIGHTS_IN_A_ROW && (
+          <Card style={{ backgroundColor: colors.accentSoft }}>
+            <Text style={styles.body}>
+              {shortNights} short nights in a row. Take longer rests and use the easier versions today, or swap in Cardio + Core.
+            </Text>
+          </Card>
+        )}
 
         <Card style={{ backgroundColor: colors.accentSoft }}>
           <Text style={styles.body}>{SAFETY}</Text>
