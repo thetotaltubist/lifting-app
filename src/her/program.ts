@@ -6,7 +6,7 @@ import { Move, Workout } from './types';
 // - Neck stays long and neutral. Eyes follow the floor a few feet ahead
 //   when hinged, never cranked up.
 // - Nothing heavy overhead (overhead pressing is capped at 8 lb).
-// - No jumping, no burpees, no fast floor-to-standing moves. Mat work is
+// - Jumping jacks are the only jumping. No burpees, no fast floor-to-standing moves. Mat work is
 //   grouped into its own circuit so she gets down and up once, slowly.
 // - Breathe out on the effort. Never hold your breath or bear down.
 // ------------------------------------------------------------------
@@ -23,8 +23,9 @@ const M: Move[] = [
   { id: 'wu-chair-squat', name: 'Squat to a chair', kind: 'cardio', cue: 'Sit back until you touch the chair, then stand. No weight.' },
   { id: 'wu-good-morning', name: 'Hip hinge (no weight)', kind: 'stretch', cue: 'Hands on hips, push the hips back, flat back, eyes to the floor ahead.' },
 
-  // ---------- Low-impact cardio (timed, no jumping) ----------
-  { id: 'step-jacks', name: 'Step jacks', kind: 'cardio', cue: 'Step one foot out as the arms sweep out to shoulder height. No jumping.' },
+  // ---------- Cardio (timed). Jumping jacks are the one move with a jump ----------
+  // The id stays 'step-jacks' so workouts already logged still find it
+  { id: 'step-jacks', name: 'Jumping jacks', kind: 'cardio', cue: 'Jump the feet out wide as the arms sweep up, then jump back in. Land softly on the balls of your feet.' },
   { id: 'boxer-shuffle', name: 'Boxer shuffle with punches', kind: 'cardio', cue: 'Light bounce on the balls of the feet, quick punches at chest height. No weights.' },
   { id: 'knee-drives', name: 'Standing knee drives', kind: 'cardio', cue: 'Drive one knee up as you pull the arms down. Alternate sides. Stand tall.' },
   { id: 'skater-steps', name: 'Skater steps', kind: 'cardio', cue: 'Step wide to the side and sweep the back leg behind. No hop.' },
@@ -191,7 +192,7 @@ export const WORKOUTS: Workout[] = [
     name: 'Cardio Strength Circuit',
     short: 'Cardio Strength',
     minutes: [30, 40],
-    focus: 'Strength moves traded off with low-impact cardio. The most cardio-heavy day, with no jumping.',
+    focus: 'Strength moves traded off with low-impact cardio. The most cardio-heavy day.',
     warmup: WARMUP_FULL,
     circuits: [
       { name: 'Round 1', moves: ['goblet-squat', 'skater-steps', 'bent-row', 'knee-drives'] },

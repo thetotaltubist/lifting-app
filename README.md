@@ -22,7 +22,7 @@ The Jaown & Mayg / Mandy switch at the top of the Next and Settings screens flip
 - **Guided like a class:** one move at a time, timers for cardio, holds and rests run on their own.
 - **Her dumbbells:** 5, 8, 10, 12, 15 and 20 lb. Weights go up one dumbbell when she hits the top of the range every round with good form and no symptoms.
 - **Gym days:** on weekends (changeable) moves with a machine or cable version use it, tracked separately.
-- **Neck-safe:** built around her Chiari decompression. No heavy overhead work (presses capped at 8 lb), no jumping, neutral neck, and mat work grouped so she gets down and up once.
+- **Neck-safe:** built around her Chiari decompression. No heavy overhead work (presses capped at 8 lb), jumping jacks the only jumping, neutral neck, and mat work grouped so she gets down and up once.
 - **Six weeks, three levels:** nothing gets harder on a schedule. After each workout she answers four quick questions (effort, form, symptoms, recovery), and the app only suggests a new level after at least 8 good workouts.
 
 Everything is stored on the phone.
