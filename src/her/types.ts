@@ -15,7 +15,6 @@ export type Move = {
   maxWeight?: number; // cap, for anything that goes overhead
   floor?: boolean; // done lying or kneeling on the mat
   cue: string; // how to do it well
-  easier: string; // what to do instead if the neck complains or she feels dizzy
   gym?: { name: string; cue: string }; // machine or cable version on gym days
 };
 

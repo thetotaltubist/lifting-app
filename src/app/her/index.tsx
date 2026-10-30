@@ -150,7 +150,7 @@ export default function HerTodayScreen() {
         {shortNights >= SHORT_NIGHTS_IN_A_ROW && (
           <Card style={{ backgroundColor: colors.accentSoft }}>
             <Text style={styles.body}>
-              {shortNights} short nights in a row. Take longer rests and use the easier versions today, or swap in Cardio + Core.
+              {shortNights} short nights in a row. Take longer rests today, or swap in Cardio + Core.
             </Text>
           </Card>
         )}

@@ -42,7 +42,6 @@ export default function HerWorkoutScreen() {
   const [now, setNow] = useState(() => Date.now());
   const [weight, setWeight] = useState<number | null>(null);
   const [reps, setReps] = useState(0);
-  const [showEasier, setShowEasier] = useState(false);
   const [checkIn, setCheckIn] = useState<Partial<CheckIn>>({});
   const loaded = useRef(false);
 
@@ -74,7 +73,6 @@ export default function HerWorkoutScreen() {
   const [seen, setSeen] = useState<number | null>(null);
   if (step && seen !== index) {
     setSeen(index);
-    setShowEasier(false);
     setPaused(null);
     if (step.kind === 'reps') {
       const logged = active!.logs[index];
@@ -200,7 +198,7 @@ export default function HerWorkoutScreen() {
         {checkIn.symptoms && checkIn.symptoms !== 'none' && (
           <Card style={{ backgroundColor: colors.accentSoft }}>
             <Text style={styles.body}>
-              Next time the app keeps the weights where they are and suggests the easier versions. If a symptom is new, strong, or keeps coming back, check in with your surgeon.
+              Next time the app keeps the weights where they are. If a symptom is new, strong, or keeps coming back, check in with your surgeon.
             </Text>
           </Card>
         )}
@@ -255,16 +253,6 @@ export default function HerWorkoutScreen() {
           <>
             <Text style={[styles.title, { marginTop: 4 }]}>{onGym ? m!.gym!.name : m!.name}</Text>
             <Text style={[styles.body, { marginTop: 6 }]}>{onGym ? m!.gym!.cue : m!.cue}</Text>
-            <Pressable onPress={() => setShowEasier((x) => !x)} hitSlop={6}>
-              <Text style={{ color: colors.accent, fontWeight: '600', marginTop: 10 }}>
-                {showEasier ? 'Hide easier version' : 'Neck or dizziness? Easier version'}
-              </Text>
-            </Pressable>
-            {showEasier && (
-              <Card style={{ backgroundColor: colors.accentSoft, marginTop: 8 }}>
-                <Text style={styles.body}>{m!.easier}</Text>
-              </Card>
-            )}
           </>
         )}
 

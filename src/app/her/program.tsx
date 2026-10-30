@@ -8,7 +8,7 @@ import { Circuit, Level } from '../../her/types';
 import { herColors as colors } from '../../theme';
 
 // The whole six-week plan in one place: every workout, move, weight,
-// interval and easier version, plus how it gets harder.
+// and interval, plus how it gets harder.
 export default function HerProgramScreen() {
   const [open, setOpen] = useState<string | null>(WORKOUTS[0].id);
 
@@ -81,7 +81,7 @@ export default function HerProgramScreen() {
         <Card>
           <Text style={styles.h2}>Built around your neck</Text>
           <Muted style={{ marginTop: 8 }}>
-            Neck stays long and neutral, with your eyes on the floor a few feet ahead when you hinge. Nothing heavy overhead (8 lb max for presses). No jumping, no burpees, no quick moves from the floor to standing. Mat work is grouped together so you get down and up once, slowly. Breathe out on the effort and never hold your breath. Every move has an easier version.
+            Neck stays long and neutral, with your eyes on the floor a few feet ahead when you hinge. Nothing heavy overhead (8 lb max for presses). No jumping, no burpees, no quick moves from the floor to standing. Mat work is grouped together so you get down and up once, slowly. Breathe out on the effort and never hold your breath.
           </Muted>
         </Card>
       </ScrollView>
@@ -110,7 +110,6 @@ function Section({ title, detail, ids, note }: { title: string; detail: string; 
               {m.name}
               {(amount || weight) && <Text style={{ color: colors.muted }}> · {amount}{weight}</Text>}
             </Text>
-            <Muted>Easier: {m.easier}</Muted>
             {m.gym && <Muted>At the gym: {m.gym.name}</Muted>}
           </View>
         );

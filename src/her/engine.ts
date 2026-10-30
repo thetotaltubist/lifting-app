@@ -111,10 +111,10 @@ export function suggestMove(m: Move, gym: boolean, sessions: HerSession[]): Move
   if (c && (c.symptoms === 'stopped' || c.effort === 'tooHard')) {
     if (lastWeight != null && !onGym) {
       const down = dumbbellStep(lastWeight, -1, cap);
-      if (down) return { weight: down, reps: lo, why: `Last time was too much, so one dumbbell lighter (${down} lb). Use the easier version if anything bothers you.` };
+      if (down) return { weight: down, reps: lo, why: `Last time was too much, so one dumbbell lighter (${down} lb).` };
     }
     if (lastWeight != null && onGym) return { weight: Math.max(0, lastWeight - 5), reps: lo, why: 'Last time was too much, so a little lighter.' };
-    return { weight: lastWeight, reps: lo, why: 'Last time was too much. Keep it easy and use the easier version if anything bothers you.' };
+    return { weight: lastWeight, reps: lo, why: 'Last time was too much. Keep it easy this time.' };
   }
 
   if (c && (c.symptoms === 'mild' || c.form === 'sloppy' || c.recovery === 'wiped')) {
@@ -236,8 +236,8 @@ export function levelAdvice(sessions: HerSession[], settings: HerSettings): Leve
       title: 'Take it easy next time',
       body:
         settings.level > 1
-          ? 'You had to stop for symptoms last time. Consider stepping back a level and using the easier versions. If symptoms keep coming back, check in with your surgeon.'
-          : 'You had to stop for symptoms last time. Use the easier versions and take longer rests. If symptoms keep coming back, check in with your surgeon.',
+          ? 'You had to stop for symptoms last time. Consider stepping back a level. If symptoms keep coming back, check in with your surgeon.'
+          : 'You had to stop for symptoms last time. Take longer rests. If symptoms keep coming back, check in with your surgeon.',
     };
   }
 

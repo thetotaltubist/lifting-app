@@ -158,7 +158,7 @@ export default function HerBodyScreen() {
               ))}
               <Muted style={{ marginTop: 8 }}>
                 {short >= 3
-                  ? `${short} short nights in a row. Take longer rests and use the easier versions today if you need to.`
+                  ? `${short} short nights in a row. Take longer rests today if you need to.`
                   : `Under ${SHORT_NIGHT_HOURS} hours counts as short.`}
               </Muted>
             </>
