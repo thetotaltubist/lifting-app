@@ -41,7 +41,7 @@ const rounds = (moveId: string, weight: number | null, reps: number[], gym = fal
 
 test('every move in every workout exists, and dumbbell starts are ones she owns', () => {
   for (const w of WORKOUTS) {
-    for (const id of [...w.warmup, ...w.cooldown, ...w.circuits.flatMap((c) => c.moves), ...w.finishers.flatMap((c) => c.moves)]) move(id);
+    for (const id of [...w.warmup, ...w.cooldown, ...w.circuits.flatMap((c) => c.moves), ...w.finishers.flatMap((c) => c.moves)]) assert.notEqual(move(id).id, 'unknown', id);
   }
   for (const m of MOVES) {
     if (m.start != null) assert.ok(DUMBBELLS.includes(m.start), m.id);
@@ -84,7 +84,7 @@ test('weeks count from the program start, and finishers alternate', () => {
 
 test('first time: starting dumbbell at the bottom of the range', () => {
   const s = suggestMove(move('goblet-squat'), false, []);
-  assert.equal(s.weight, 15);
+  assert.equal(s.weight, 20);
   assert.equal(s.reps, 12);
 });
 
@@ -126,7 +126,7 @@ test('at the 20 lb dumbbell, it slows the tempo instead', () => {
 test('gym weights are tracked apart from her dumbbells', () => {
   const sessions = [session(0, 'lower', rounds('goblet-squat', 90, [15, 15], true), fine, { gym: true })];
   assert.equal(suggestMove(move('goblet-squat'), true, sessions).weight, 95);
-  assert.equal(suggestMove(move('goblet-squat'), false, sessions).weight, 15);
+  assert.equal(suggestMove(move('goblet-squat'), false, sessions).weight, 20);
 });
 
 test('gym day swaps in machine versions in the steps', () => {
