@@ -49,10 +49,6 @@ test('every move in every workout exists, and dumbbell starts are ones she owns'
   }
 });
 
-test('nothing heavy overhead', () => {
-  assert.ok((move('shoulder-press').maxWeight ?? 99) <= 8);
-});
-
 test('mat moves are grouped so she gets down and up once per circuit', () => {
   for (const w of WORKOUTS) {
     for (const c of [...w.circuits, ...w.finishers]) {
@@ -119,12 +115,6 @@ test('mild symptoms or sloppy form hold everything', () => {
 test('stopping for symptoms drops a dumbbell', () => {
   const s = suggestMove(move('goblet-squat'), false, [session(0, 'lower', rounds('goblet-squat', 15, [10, 8]), { ...fine, symptoms: 'stopped' })]);
   assert.equal(s.weight, 12);
-});
-
-test('overhead press never suggests more than its cap', () => {
-  const s = suggestMove(move('shoulder-press'), false, [session(0, 'upper', rounds('shoulder-press', 8, [15, 15]))]);
-  assert.equal(s.weight, 8);
-  assert.match(s.why, /neck/);
 });
 
 test('at the 20 lb dumbbell, it slows the tempo instead', () => {

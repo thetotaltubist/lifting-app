@@ -84,16 +84,14 @@ function lastLogs(moveId: string, gym: boolean, sessions: HerSession[]) {
   return null;
 }
 
-function dumbbellStep(weight: number, by: 1 | -1, cap: number) {
-  const owned = DUMBBELLS.filter((d) => d <= cap);
-  if (by > 0) return owned.find((d) => d > weight) ?? null;
-  return [...owned].reverse().find((d) => d < weight) ?? null;
+function dumbbellStep(weight: number, by: 1 | -1) {
+  if (by > 0) return DUMBBELLS.find((d) => d > weight) ?? null;
+  return [...DUMBBELLS].reverse().find((d) => d < weight) ?? null;
 }
 
 export function suggestMove(m: Move, gym: boolean, sessions: HerSession[]): MoveSuggestion {
   const [lo, hi] = m.reps ?? [0, 0];
   const onGym = usesGym(m, gym);
-  const cap = Math.min(m.maxWeight ?? Infinity, DUMBBELLS[DUMBBELLS.length - 1]);
   const last = lastLogs(m.id, onGym, sessions);
 
   if (!last) {
@@ -110,7 +108,7 @@ export function suggestMove(m: Move, gym: boolean, sessions: HerSession[]): Move
 
   if (c && (c.symptoms === 'stopped' || c.effort === 'tooHard')) {
     if (lastWeight != null && !onGym) {
-      const down = dumbbellStep(lastWeight, -1, cap);
+      const down = dumbbellStep(lastWeight, -1);
       if (down) return { weight: down, reps: lo, why: `Last time was too much, so one dumbbell lighter (${down} lb).` };
     }
     if (lastWeight != null && onGym) return { weight: Math.max(0, lastWeight - 5), reps: lo, why: 'Last time was too much, so a little lighter.' };
@@ -124,16 +122,9 @@ export function suggestMove(m: Move, gym: boolean, sessions: HerSession[]): Move
   if (allTop && c?.effort !== 'hard') {
     if (lastWeight == null) return { weight: null, reps: hi, why: 'You own the full range. Slow the lowering to 3 seconds to keep it challenging.' };
     if (onGym) return { weight: lastWeight + 5, reps: lo, why: `You hit ${hi} every round. Up 5 lb.` };
-    const up = dumbbellStep(lastWeight, 1, cap);
+    const up = dumbbellStep(lastWeight, 1);
     if (up) return { weight: up, reps: lo, why: `You hit ${hi} every round at ${lastWeight} lb. Try ${up} lb.` };
-    const capped = m.maxWeight != null && lastWeight >= m.maxWeight;
-    return {
-      weight: lastWeight,
-      reps: hi,
-      why: capped
-        ? `${lastWeight} lb is the top for this one to keep weight off the neck. Slow the lowering to 3 seconds instead.`
-        : 'That is your heaviest dumbbell. Slow the lowering to 3 seconds to keep it challenging.',
-    };
+    return { weight: lastWeight, reps: hi, why: 'That is your heaviest dumbbell. Slow the lowering to 3 seconds to keep it challenging.' };
   }
 
   const target = Math.max(lo, Math.min(hi, minReps + 1));
@@ -236,8 +227,8 @@ export function levelAdvice(sessions: HerSession[], settings: HerSettings): Leve
       title: 'Take it easy next time',
       body:
         settings.level > 1
-          ? 'You had to stop for symptoms last time. Consider stepping back a level. If symptoms keep coming back, check in with your surgeon.'
-          : 'You had to stop for symptoms last time. Take longer rests. If symptoms keep coming back, check in with your surgeon.',
+          ? 'You had to stop last time. Consider stepping back a level.'
+          : 'You had to stop last time. Take longer rests this time.',
     };
   }
 
@@ -258,7 +249,7 @@ export function levelAdvice(sessions: HerSession[], settings: HerSettings): Leve
       return {
         kind: 'up',
         title: `Ready for Level ${settings.level + 1}?`,
-        body: `Your last workouts were complete, felt about right, with solid form and no symptoms. ${next.name} means ${next.cardio}-second cardio intervals, ${next.rounds} rounds, and shorter rests. Only if you feel ready.`,
+        body: `Your last workouts were complete, felt about right, with solid form and no pain. ${next.name} means ${next.cardio}-second cardio intervals, ${next.rounds} rounds, and shorter rests. Only if you feel ready.`,
       };
     }
   }

@@ -1,14 +1,9 @@
 import { Move, Workout } from './types';
 
 // ------------------------------------------------------------------
-// Her program. Built around her Chiari history and decompression
-// surgery, so every move follows the same rules:
-// - Neck stays long and neutral. Eyes follow the floor a few feet ahead
-//   when hinged, never cranked up.
-// - Nothing heavy overhead (overhead pressing is capped at 8 lb).
-// - Jumping jacks are the only jumping. No burpees, no fast floor-to-standing moves. Mat work is
-//   grouped into its own circuit so she gets down and up once, slowly.
-// - Breathe out on the effort. Never hold your breath or bear down.
+// Her program: high-rep dumbbell circuits with cardio, in the style of a
+// guided home fitness class. Mat work is grouped into its own circuit so
+// the flow doesn't keep going down to the floor and back up.
 // ------------------------------------------------------------------
 
 export const DUMBBELLS = [5, 8, 10, 12, 15, 20];
@@ -23,12 +18,12 @@ const M: Move[] = [
   { id: 'wu-chair-squat', name: 'Squat to a chair', kind: 'cardio', cue: 'Sit back until you touch the chair, then stand. No weight.' },
   { id: 'wu-good-morning', name: 'Hip hinge (no weight)', kind: 'stretch', cue: 'Hands on hips, push the hips back, flat back, eyes to the floor ahead.' },
 
-  // ---------- Cardio (timed). Jumping jacks are the one move with a jump ----------
-  // The id stays 'step-jacks' so workouts already logged still find it
+  // ---------- Cardio (timed) ----------
+  // The id is still 'step-jacks' (its old name) so logged workouts find it
   { id: 'step-jacks', name: 'Jumping jacks', kind: 'cardio', cue: 'Jump the feet out wide as the arms sweep up, then jump back in. Land softly on the balls of your feet.' },
   { id: 'boxer-shuffle', name: 'Boxer shuffle with punches', kind: 'cardio', cue: 'Light bounce on the balls of the feet, quick punches at chest height. No weights.' },
   { id: 'knee-drives', name: 'Standing knee drives', kind: 'cardio', cue: 'Drive one knee up as you pull the arms down. Alternate sides. Stand tall.' },
-  { id: 'skater-steps', name: 'Skater steps', kind: 'cardio', cue: 'Step wide to the side and sweep the back leg behind. No hop.' },
+  { id: 'skater-steps', name: 'Skaters', kind: 'cardio', cue: 'Hop side to side, landing on one foot with the other leg sweeping behind. Land softly.' },
   { id: 'side-shuffle', name: 'Side shuffle', kind: 'cardio', cue: 'Three quick steps one way, three back. Stay low, chest up.' },
   { id: 'fast-march', name: 'Fast march', kind: 'cardio', cue: 'March quickly and pump the arms. Land softly.' },
   { id: 'heel-digs', name: 'Heel digs with chest press', kind: 'cardio', cue: 'Tap one heel forward as you push both hands out from the chest. Alternate quickly.' },
@@ -37,10 +32,10 @@ const M: Move[] = [
 
   // ---------- Upper body ----------
   { id: 'bent-row', name: 'Bent-over row', kind: 'strength', reps: [12, 15], start: 12, cue: 'Hinge to about 45°, flat back, eyes on the floor a few feet ahead. Pull elbows back to the ribs.', gym: { name: 'Seated cable row', cue: 'Sit tall, pull the handle to your belly button. Chin stays level.' } },
-  { id: 'single-row', name: 'Supported single-arm row', kind: 'strength', reps: [12, 15], perSide: true, start: 12, cue: 'One hand and knee on a chair or bench. Pull the dumbbell to the hip.', gym: { name: 'Lat pulldown', cue: 'Wide grip, pull to the top of the chest. Never behind the neck. Look straight ahead.' } },
-  { id: 'lateral-raise', name: 'Lateral raise', kind: 'strength', reps: [12, 15], start: 5, maxWeight: 10, cue: 'Raise out to the sides to shoulder height, no higher. Slight bend in the elbows.', gym: { name: 'Cable lateral raise', cue: 'One arm at a time, to shoulder height. Light stack.' } },
-  { id: 'front-raise', name: 'Front raise', kind: 'strength', reps: [12, 15], start: 5, maxWeight: 10, cue: 'Raise in front to shoulder height, palms facing in. Stop at eye level.' },
-  { id: 'shoulder-press', name: 'Seated shoulder press (neutral grip)', kind: 'strength', reps: [12, 15], start: 5, maxWeight: 8, cue: 'Sit tall with back support. Palms facing in, press up without locking out. Light only.', gym: { name: 'Machine shoulder press', cue: 'Lightest few plates only. Back against the pad, head neutral. Stop short of lockout.' } },
+  { id: 'single-row', name: 'Supported single-arm row', kind: 'strength', reps: [12, 15], perSide: true, start: 12, cue: 'One hand and knee on a chair or bench. Pull the dumbbell to the hip.', gym: { name: 'Lat pulldown', cue: 'Wide grip, pull to the top of the chest. Chest up.' } },
+  { id: 'lateral-raise', name: 'Lateral raise', kind: 'strength', reps: [12, 15], start: 5, cue: 'Raise out to the sides to shoulder height, no higher. Slight bend in the elbows.', gym: { name: 'Cable lateral raise', cue: 'One arm at a time, to shoulder height. Light stack.' } },
+  { id: 'front-raise', name: 'Front raise', kind: 'strength', reps: [12, 15], start: 5, cue: 'Raise in front to shoulder height, palms facing in. Stop at eye level.' },
+  { id: 'shoulder-press', name: 'Seated shoulder press (neutral grip)', kind: 'strength', reps: [12, 15], start: 5, cue: 'Sit tall with back support. Palms facing in, press up without locking out.', gym: { name: 'Machine shoulder press', cue: 'Back against the pad. Press up, stop short of lockout.' } },
   { id: 'reverse-fly', name: 'Reverse fly', kind: 'strength', reps: [15, 20], start: 5, cue: 'Hinge forward, flat back, eyes on the floor ahead. Open the arms out wide, squeeze the shoulder blades.', gym: { name: 'Reverse pec deck', cue: 'Chest against the pad, open the arms wide.' } },
   { id: 'w-raise', name: 'Standing W raise', kind: 'strength', reps: [12, 15], cue: 'Elbows bent, arms in a W at shoulder height. Squeeze the shoulder blades back and down. No weight.' },
   { id: 'biceps-curl', name: 'Biceps curl', kind: 'strength', reps: [12, 15], start: 10, cue: 'Elbows pinned at your sides. Lower slowly.', gym: { name: 'Cable curl', cue: 'Elbows at your sides, slow on the way down.' } },
@@ -56,7 +51,7 @@ const M: Move[] = [
   // ---------- Lower body ----------
   { id: 'goblet-squat', name: 'Goblet squat', kind: 'strength', reps: [12, 15], start: 15, cue: 'Hold one dumbbell at your chest. Sit back and down, chest up, eyes forward.', gym: { name: 'Leg press', cue: 'Moderate weight. Head back against the pad. Breathe out as you push, never hold your breath.' } },
   { id: 'sumo-squat', name: 'Sumo squat', kind: 'strength', reps: [15, 20], start: 15, cue: 'Wide stance, toes out, hold one dumbbell between your legs. Sit straight down.', gym: { name: 'Hip abduction machine', cue: 'Sit tall, push the knees out, slow on the way back.' } },
-  { id: 'rdl', name: 'Romanian deadlift', kind: 'strength', reps: [12, 15], start: 15, cue: 'Soft knees, push the hips back with a flat back. Dumbbells slide down the thighs. Eyes on the floor ahead, neck long.', gym: { name: 'Seated leg curl', cue: 'Curl down, slow on the way back. Sit back against the pad.' } },
+  { id: 'rdl', name: 'Romanian deadlift', kind: 'strength', reps: [12, 15], start: 15, cue: 'Soft knees, push the hips back with a flat back. Dumbbells slide down the thighs.', gym: { name: 'Seated leg curl', cue: 'Curl down, slow on the way back. Sit back against the pad.' } },
   { id: 'staggered-rdl', name: 'Staggered Romanian deadlift', kind: 'strength', reps: [10, 12], perSide: true, start: 12, cue: 'One foot back on its toes like a kickstand. Hinge over the front leg.' },
   { id: 'reverse-lunge', name: 'Reverse lunge', kind: 'strength', reps: [10, 12], perSide: true, start: 10, cue: 'Step back, lower the back knee toward the floor, push through the front heel. Torso tall.', gym: { name: 'Smith machine split squat', cue: 'Light bar, feet staggered, straight down and up. Or keep the dumbbell version.' } },
   { id: 'curtsy-lunge', name: 'Curtsy lunge', kind: 'strength', reps: [10, 12], perSide: true, start: 8, cue: 'Step one leg behind and across. Hips stay square.' },
@@ -69,7 +64,7 @@ const M: Move[] = [
   { id: 'side-leg-lift', name: 'Side-lying leg lift', kind: 'strength', reps: [15, 20], perSide: true, floor: true, cue: 'Head resting on your bottom arm. Lift the top leg slightly behind you.' },
   { id: 'clamshell', name: 'Clamshell', kind: 'strength', reps: [15, 20], perSide: true, floor: true, cue: 'On your side, knees bent, head on your arm. Open the top knee, feet together.' },
   { id: 'dead-bug', name: 'Dead bug', kind: 'core', reps: [10, 12], perSide: true, floor: true, cue: 'Head stays on the mat. Low back pressed down. Lower opposite arm and leg slowly.' },
-  { id: 'bird-dog', name: 'Bird dog', kind: 'core', reps: [10, 12], perSide: true, floor: true, cue: 'On hands and knees, reach opposite arm and leg long. Eyes on the mat, neck in line with your back.' },
+  { id: 'bird-dog', name: 'Bird dog', kind: 'core', reps: [10, 12], perSide: true, floor: true, cue: 'On hands and knees, reach opposite arm and leg long. Keep the back flat.' },
   { id: 'plank', name: 'Forearm plank', kind: 'core', floor: true, cue: 'Elbows under shoulders, straight line from head to heels. Eyes on the mat between your hands. Keep breathing.' },
   { id: 'side-plank', name: 'Side plank on knees', kind: 'core', perSide: true, floor: true, cue: 'Elbow under shoulder, knees bent, lift the hips. Head in line with the spine.' },
   { id: 'bridge-march', name: 'Bridge march', kind: 'core', floor: true, cue: 'Hold a bridge and slowly lift one foot at a time. Hips stay level.' },
@@ -88,7 +83,7 @@ const M: Move[] = [
   { id: 'cd-quad', name: 'Standing quad stretch', kind: 'stretch', perSide: true, cue: 'Hold a wall or chair, pull one heel toward your seat.' },
   { id: 'cd-hamstring', name: 'Standing hamstring stretch', kind: 'stretch', perSide: true, cue: 'One heel forward, toes up, hinge with a flat back.' },
   { id: 'cd-figure4', name: 'Seated figure-4 stretch', kind: 'stretch', perSide: true, cue: 'Sit on a chair, ankle over the other knee, lean forward with a flat back.' },
-  { id: 'cd-child', name: "Child's pose", kind: 'stretch', floor: true, cue: 'Knees wide, forehead resting on your stacked hands or a pillow so the neck stays relaxed.' },
+  { id: 'cd-child', name: "Child's pose", kind: 'stretch', floor: true, cue: 'Knees wide, forehead resting on the mat or your hands.' },
   { id: 'cd-breathe', name: 'Belly breathing', kind: 'stretch', floor: true, cue: 'Lie down, knees bent, one hand on your belly. Slow breaths in and out.' },
 ];
 
@@ -135,7 +130,7 @@ export const WORKOUTS: Workout[] = [
     name: 'Lower Body + Glutes',
     short: 'Lower',
     minutes: [35, 40],
-    focus: 'Quads, hamstrings, glutes and calves, with a little low-impact cardio.',
+    focus: 'Quads, hamstrings, glutes and calves, with a little cardio.',
     warmup: WARMUP_LOWER,
     circuits: [
       { name: 'Squat and hinge', moves: ['goblet-squat', 'rdl', 'skater-steps'] },
@@ -154,7 +149,7 @@ export const WORKOUTS: Workout[] = [
     name: 'Cardio + Core',
     short: 'Cardio + Core',
     minutes: [25, 35],
-    focus: 'Low-impact cardio intervals and core stability. A lighter day for the muscles.',
+    focus: 'Cardio intervals and core stability. A lighter day for the muscles.',
     light: true,
     warmup: WARMUP_FULL,
     circuits: [
@@ -192,7 +187,7 @@ export const WORKOUTS: Workout[] = [
     name: 'Cardio Strength Circuit',
     short: 'Cardio Strength',
     minutes: [30, 40],
-    focus: 'Strength moves traded off with low-impact cardio. The most cardio-heavy day.',
+    focus: 'Strength moves traded off with cardio. The most cardio-heavy day.',
     warmup: WARMUP_FULL,
     circuits: [
       { name: 'Round 1', moves: ['goblet-squat', 'skater-steps', 'bent-row', 'knee-drives'] },

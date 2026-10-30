@@ -59,7 +59,7 @@ export default function HerHistoryScreen() {
                 </Muted>
                 {c && c.symptoms !== 'none' && (
                   <Text style={{ color: colors.warn, fontSize: 13, marginTop: 2 }}>
-                    {c.symptoms === 'stopped' ? 'Stopped for symptoms' : 'Mild symptoms'}
+                    {c.symptoms === 'stopped' ? 'Stopped for pain' : 'A little pain'}
                   </Text>
                 )}
                 {expanded &&

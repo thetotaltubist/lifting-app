@@ -194,11 +194,11 @@ export default function HerWorkoutScreen() {
         <Muted style={{ marginBottom: 14 }}>A quick check-in. It decides when your weights and level go up, so nothing gets harder before you{"'"}re ready.</Muted>
         {q('How hard was it?', EFFORT, 'effort')}
         {q('How was your form?', FORM, 'form')}
-        {q('Any neck discomfort, headache or dizziness?', SYMPTOMS, 'symptoms')}
+        {q('Any pain, or anything feel off?', SYMPTOMS, 'symptoms')}
         {checkIn.symptoms && checkIn.symptoms !== 'none' && (
           <Card style={{ backgroundColor: colors.accentSoft }}>
             <Text style={styles.body}>
-              Next time the app keeps the weights where they are. If a symptom is new, strong, or keeps coming back, check in with your surgeon.
+              Next time the app keeps the weights where they are.
             </Text>
           </Card>
         )}
@@ -279,7 +279,7 @@ export default function HerWorkoutScreen() {
                   />
                 ) : (
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                    {DUMBBELLS.filter((d) => d <= (m!.maxWeight ?? Infinity)).map((d) => (
+                    {DUMBBELLS.map((d) => (
                       <Chip key={d} label={String(d)} selected={weight === d} onPress={() => setWeight(d)} />
                     ))}
                   </View>

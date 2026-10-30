@@ -12,7 +12,6 @@ export type Move = {
   reps?: [number, number]; // rep range; moves without one are timed
   perSide?: boolean; // reps or time are for each side
   start?: number; // starting dumbbell, lb. Missing means bodyweight
-  maxWeight?: number; // cap, for anything that goes overhead
   floor?: boolean; // done lying or kneeling on the mat
   cue: string; // how to do it well
   gym?: { name: string; cue: string }; // machine or cable version on gym days
