@@ -11,7 +11,7 @@
       "bundleIdentifier": "com.jdicesar.totallift",
       "supportsTablet": true,
       "appleTeamId": "7V9S64W92Z",
-      "buildNumber": "8",
+      "buildNumber": "9",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSHealthShareUsageDescription": "Mayg & Jaown reads your weight, sleep, HRV and resting heart rate to keep your cut from costing muscle. Nothing is written to Health.",
