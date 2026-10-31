@@ -1,9 +1,9 @@
 /// <reference types="node" />
 import assert from 'node:assert/strict';
+import { existsSync, readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { buildSteps, estimateMinutes, finisherFor, levelAdvice, MIN_WORKOUTS_PER_LEVEL, nextWorkoutId, programWeek, suggestMove } from './engine';
 import { DUMBBELLS, move, MOVES, ROTATION, workout, WORKOUTS } from './program';
-import { GYM_PICTURES } from './gymPictures';
 import { CheckIn, HerSession, HerSettings, MoveLog } from './types';
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -151,7 +151,12 @@ test('stopping for symptoms suggests stepping back', () => {
   assert.equal(levelAdvice(s, settings)?.kind, 'hold');
 });
 
-test('every gym machine has a picture', () => {
-  for (const m of MOVES.filter((x) => x.gym)) assert.ok(GYM_PICTURES[m.id], `${m.id} has no gym picture`);
-  for (const id of Object.keys(GYM_PICTURES)) assert.ok(MOVES.find((x) => x.id === id)?.gym, `${id} is not a gym move`);
+test('every gym machine has start and finish photos', () => {
+  const src = readFileSync(new URL('./gymPhotos.ts', import.meta.url), 'utf8');
+  const ids = [...src.matchAll(/^\s+'?([\w-]+)'?: \[require/gm)].map((x) => x[1]);
+  for (const m of MOVES.filter((x) => x.gym)) assert.ok(ids.includes(m.id), `${m.id} has no gym photos`);
+  for (const id of ids) {
+    assert.ok(MOVES.find((x) => x.id === id)?.gym, `${id} is not a gym move`);
+    for (const i of [0, 1]) assert.ok(existsSync(new URL(`../../assets/gym/${id}-${i}.jpg`, import.meta.url)), `${id}-${i}.jpg missing`);
+  }
 });

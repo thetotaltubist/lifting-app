@@ -267,7 +267,7 @@ export default function HerWorkoutScreen() {
           <>
             {onGym && (
               <View style={{ marginTop: 8, alignItems: 'center' }}>
-                <GymPicture moveId={m!.id} width={220} />
+                <GymPicture moveId={m!.id} width={320} />
               </View>
             )}
             <Text style={[styles.title, { marginTop: 4 }]}>{onGym ? m!.gym!.name : m!.name}</Text>
