@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { Alert, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useFocusEffect } from 'expo-router';
+import { GymCard } from '../../components/GymPicture';
 import PersonSwitch from '../../components/PersonSwitch';
 import { Badge, Button, Card, Chip, Muted, styles, Title } from '../../components/ui';
 import {
@@ -16,6 +17,7 @@ import {
   programDone,
   programWeek,
   Step,
+  usesGym,
 } from '../../her/engine';
 import { move, ROTATION, workout, WORKOUTS } from '../../her/program';
 import { clearHerActive, loadHerActive, loadHerSessions, loadHerSettings, saveHerActive, updateHerSettings } from '../../her/storage';
@@ -49,6 +51,10 @@ export default function HerTodayScreen() {
   const steps = buildSteps(w, settings.level, week, atGym, sessions);
   const advice = levelAdvice(sessions, settings);
   const spec = LEVELS[settings.level];
+  // Today's machines, in workout order, each once
+  const machines = [...new Set(steps.flatMap((s) => (s.kind === 'rest' ? [] : [s.moveId])))]
+    .map(move)
+    .filter((m) => usesGym(m, atGym));
 
   async function change(c: Partial<HerSettings>) {
     setSettings(await updateHerSettings(c));
@@ -140,6 +146,18 @@ export default function HerTodayScreen() {
           </View>
           {atGym && <Muted>Moves with a machine or cable version use it today. {w.gymNote ?? ''}</Muted>}
         </Card>
+
+        {machines.length > 0 && (
+          <Card>
+            <Text style={styles.h2}>{"Today's machines"}</Text>
+            <Muted style={{ marginTop: 2, marginBottom: 10 }}>Swipe to see what to look for at the gym.</Muted>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {machines.map((m) => (
+                <GymCard key={m.id} m={m} />
+              ))}
+            </ScrollView>
+          </Card>
+        )}
 
 
         {sections.map((sec, i) => (

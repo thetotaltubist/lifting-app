@@ -3,7 +3,9 @@ import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-nativ
 import { router, useNavigation } from 'expo-router';
 import { useKeepAwake } from 'expo-keep-awake';
 import * as Haptics from 'expo-haptics';
+import { beep, prepareBeeps } from '../beep';
 import { Button, Card, Chip, Muted, styles } from '../components/ui';
+import { GymPicture } from '../components/GymPicture';
 import { logFromStep, moveName, MoveStep, stepSeconds, usesGym } from '../her/engine';
 import { DUMBBELLS, move, workout } from '../her/program';
 import { clearHerActive, HerActive, loadHerActive, saveHerActive, saveHerSession, updateHerSettings } from '../her/storage';
@@ -46,6 +48,7 @@ export default function HerWorkoutScreen() {
   const loaded = useRef(false);
 
   useEffect(() => {
+    prepareBeeps();
     loadHerActive().then((a) => {
       if (!a) {
         router.back();
@@ -89,11 +92,22 @@ export default function HerWorkoutScreen() {
 
   useEffect(() => {
     if (!timerDone || !step) return;
+    beep('done');
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     if (step.kind === 'timed') complete();
     else go(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timerDone]);
+
+  // Beep once halfway through an each-side hold or stretch: time to switch sides
+  const switchBeeped = useRef(-1);
+  const halfway = !!step && step.kind === 'timed' && !!move(step.moveId).perSide && endAt != null && left > 0 && left <= step.seconds / 2;
+  useEffect(() => {
+    if (!halfway || switchBeeped.current === index) return;
+    switchBeeped.current = index;
+    beep('switch');
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {});
+  }, [halfway, index]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -251,6 +265,11 @@ export default function HerWorkoutScreen() {
           </>
         ) : (
           <>
+            {onGym && (
+              <View style={{ marginTop: 8, alignItems: 'center' }}>
+                <GymPicture moveId={m!.id} width={320} />
+              </View>
+            )}
             <Text style={[styles.title, { marginTop: 4 }]}>{onGym ? m!.gym!.name : m!.name}</Text>
             <Text style={[styles.body, { marginTop: 6 }]}>{onGym ? m!.gym!.cue : m!.cue}</Text>
           </>
