@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { buildSteps, estimateMinutes, finisherFor, levelAdvice, MIN_WORKOUTS_PER_LEVEL, nextWorkoutId, programWeek, suggestMove } from './engine';
 import { DUMBBELLS, move, MOVES, ROTATION, workout, WORKOUTS } from './program';
+import { GYM_PICTURES } from './gymPictures';
 import { CheckIn, HerSession, HerSettings, MoveLog } from './types';
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -148,4 +149,9 @@ test('stopping for symptoms suggests stepping back', () => {
   const s = [session(0, 'upper', [], { ...fine, symptoms: 'stopped' })];
   assert.equal(levelAdvice(s, { ...settings, level: 2 })?.kind, 'down');
   assert.equal(levelAdvice(s, settings)?.kind, 'hold');
+});
+
+test('every gym machine has a picture', () => {
+  for (const m of MOVES.filter((x) => x.gym)) assert.ok(GYM_PICTURES[m.id], `${m.id} has no gym picture`);
+  for (const id of Object.keys(GYM_PICTURES)) assert.ok(MOVES.find((x) => x.id === id)?.gym, `${id} is not a gym move`);
 });

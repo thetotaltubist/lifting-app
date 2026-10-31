@@ -5,6 +5,7 @@ import { useKeepAwake } from 'expo-keep-awake';
 import * as Haptics from 'expo-haptics';
 import { beep, prepareBeeps } from '../beep';
 import { Button, Card, Chip, Muted, styles } from '../components/ui';
+import { GymPicture } from '../components/GymPicture';
 import { logFromStep, moveName, MoveStep, stepSeconds, usesGym } from '../her/engine';
 import { DUMBBELLS, move, workout } from '../her/program';
 import { clearHerActive, HerActive, loadHerActive, saveHerActive, saveHerSession, updateHerSettings } from '../her/storage';
@@ -264,6 +265,11 @@ export default function HerWorkoutScreen() {
           </>
         ) : (
           <>
+            {onGym && (
+              <View style={{ marginTop: 8, alignItems: 'center' }}>
+                <GymPicture moveId={m!.id} width={220} />
+              </View>
+            )}
             <Text style={[styles.title, { marginTop: 4 }]}>{onGym ? m!.gym!.name : m!.name}</Text>
             <Text style={[styles.body, { marginTop: 6 }]}>{onGym ? m!.gym!.cue : m!.cue}</Text>
           </>
