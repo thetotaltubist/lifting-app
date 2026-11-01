@@ -14,7 +14,7 @@ export type Move = {
   start?: number; // starting dumbbell, lb. Missing means bodyweight
   floor?: boolean; // done lying or kneeling on the mat
   cue: string; // how to do it well
-  gym?: { name: string; cue: string }; // machine or cable version on gym days
+  gym?: { name: string; cue: string }; // machine or cable version, used in the gym workouts
 };
 
 export type Circuit = {
@@ -35,7 +35,19 @@ export type Workout = {
   circuits: Circuit[];
   finishers: [Circuit, Circuit]; // A on odd weeks, B on even weeks, for variety
   cooldown: string[]; // move ids, timed
-  gymNote?: string;
+};
+
+// Gym days: straight sets on one machine before moving to the next,
+// no circuits and no cardio
+export type GymWorkout = {
+  id: string;
+  name: string;
+  short: string;
+  minutes: [number, number];
+  focus: string;
+  warmup: string[]; // move ids, timed
+  exercises: { moveId: string; sets: number }[]; // the move's gym version
+  cooldown: string[]; // move ids, timed
 };
 
 export type Level = 1 | 2 | 3;
@@ -63,7 +75,7 @@ export type HerSession = {
   finishedAt: string;
   level: Level;
   week: number;
-  gym: boolean;
+  gym: boolean; // a gym-day workout
   completed: boolean; // made it through every circuit
   logs: MoveLog[];
   checkIn: CheckIn | null;

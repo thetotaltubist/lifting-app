@@ -21,7 +21,7 @@ The Jaown & Mayg / Mandy switch at the top of the Next and Settings screens flip
 - **5 workouts in order:** Upper Body Strength + Cardio, Lower Body + Glutes, Cardio + Core, Total Body Strength Endurance, Cardio Strength Circuit. High-rep dumbbell circuits (12-20 reps) with cardio intervals, warm-up and cooldown.
 - **Guided like a class:** one move at a time, timers for cardio, holds and rests run on their own.
 - **Her dumbbells:** 5, 8, 10, 12, 15 and 20 lb. Weights go up one dumbbell when she hits the top of the range every round with good form and no pain.
-- **Gym days:** on weekends (changeable) moves with a machine or cable version use it, tracked separately.
+- **Gym days:** on weekends (changeable) she gets her own machine workouts instead of the circuits: upper and lower alternate, 3 straight sets of 12-15 on each machine before moving on, no cardio, with start and finish photos of each machine.
 - **Six weeks, three levels:** nothing gets harder on a schedule. After each workout she answers four quick questions (effort, form, pain, recovery), and the app only suggests a new level after at least 8 good workouts.
 
 Everything is stored on the phone.

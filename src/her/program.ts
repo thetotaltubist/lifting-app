@@ -1,4 +1,4 @@
-import { Move, Workout } from './types';
+import { GymWorkout, Move, Workout } from './types';
 
 // ------------------------------------------------------------------
 // Her program: high-rep dumbbell circuits with cardio, in the style of a
@@ -59,6 +59,8 @@ const M: Move[] = [
   { id: 'calf-raise', name: 'Single-leg calf raise', kind: 'strength', reps: [15, 20], perSide: true, start: 20, cue: 'Dumbbell in one hand, up onto the toes of one foot, pause, lower slowly.', gym: { name: 'Calf raise machine', cue: 'Full stretch at the bottom, pause at the top.' } },
   { id: 'standing-kickback', name: 'Bulgarian split squat', kind: 'strength', reps: [10, 12], perSide: true, start: 10, cue: 'Back foot up on a bench or couch. Lower straight down, push through the front heel.' },
 
+  { id: 'leg-extension', name: 'Leg extension', kind: 'strength', reps: [12, 15], cue: 'Sit back, straighten the knees, squeeze the thighs at the top, lower slowly.', gym: { name: 'Leg extension', cue: 'Pad on the front of the ankles. Straighten the knees, pause, lower slowly.' } },
+
   // ---------- Glutes and core on the mat ----------
   { id: 'glute-bridge', name: 'Glute bridge', kind: 'strength', reps: [15, 20], start: 20, floor: true, cue: 'Dumbbell across the hips. Drive through the heels, squeeze hard at the top.', gym: { name: 'Hip thrust machine', cue: 'Squeeze at the top, lower with control.' } },
   { id: 'single-bridge', name: 'Single-leg glute bridge', kind: 'strength', reps: [10, 12], perSide: true, floor: true, cue: 'One foot down, the other knee hugged in or leg extended. Lift and squeeze.' },
@@ -105,8 +107,6 @@ const COOLDOWN_UPPER = ['cd-walk', 'cd-chest', 'cd-cross-arm', 'cd-triceps', 'cd
 const COOLDOWN_LOWER = ['cd-walk', 'cd-quad', 'cd-hamstring', 'cd-figure4', 'cd-child', 'cd-breathe'];
 const COOLDOWN_FULL = ['cd-walk', 'cd-chest', 'cd-quad', 'cd-hamstring', 'cd-figure4', 'cd-breathe'];
 
-const GYM_CARDIO = 'At the gym, you can do the cardio intervals on a bike, elliptical, or incline walk instead.';
-
 export const WORKOUTS: Workout[] = [
   {
     id: 'upper',
@@ -125,7 +125,6 @@ export const WORKOUTS: Workout[] = [
       { name: 'Finisher', moves: ['zottman-curl', 'w-raise', 'heel-digs'] },
     ],
     cooldown: COOLDOWN_UPPER,
-    gymNote: GYM_CARDIO,
   },
   {
     id: 'lower',
@@ -144,7 +143,6 @@ export const WORKOUTS: Workout[] = [
       { name: 'Finisher', moves: ['curtsy-lunge', 'staggered-rdl'] },
     ],
     cooldown: COOLDOWN_LOWER,
-    gymNote: GYM_CARDIO,
   },
   {
     id: 'cardio-core',
@@ -164,7 +162,6 @@ export const WORKOUTS: Workout[] = [
       { name: 'Cardio finisher', moves: ['grapevine', 'cross-knee', 'boxer-shuffle'], rounds: 1 },
     ],
     cooldown: COOLDOWN_FULL,
-    gymNote: GYM_CARDIO,
   },
   {
     id: 'total',
@@ -201,7 +198,6 @@ export const WORKOUTS: Workout[] = [
       { name: 'Finisher', moves: ['curtsy-lunge', 'grapevine'] },
     ],
     cooldown: COOLDOWN_FULL,
-    gymNote: GYM_CARDIO,
   },
 ];
 
@@ -209,4 +205,52 @@ export const ROTATION = WORKOUTS.map((w) => w.id);
 
 export function workout(id: string): Workout {
   return WORKOUTS.find((w) => w.id === id) ?? WORKOUTS[0];
+}
+
+// ---------- Gym days ----------
+// Straight sets: every set on one machine, then on to the next, ordered
+// so she isn't crossing the gym. 3 sets of 12-15, no cardio. Upper and
+// lower alternate. With the home week run Monday to Friday, a Saturday
+// upper day and Sunday lower day each get a day's rest before the same
+// muscles come up again on Monday (upper) and Tuesday (lower).
+
+export const GYM_REPS: [number, number] = [12, 15];
+export const GYM_SETS = 3;
+
+export const GYM_WORKOUTS: GymWorkout[] = [
+  {
+    id: 'gym-upper',
+    name: 'Gym: Upper Body',
+    short: 'Gym upper',
+    minutes: [35, 45],
+    focus: 'Back, chest, shoulders and arms on the machines',
+    warmup: ['wu-shoulder-rolls', 'wu-arm-circles', 'wu-good-morning'],
+    exercises: ['single-row', 'bent-row', 'close-press', 'shoulder-press', 'reverse-fly', 'biceps-curl', 'kickback'].map((moveId) => ({ moveId, sets: GYM_SETS })),
+    cooldown: ['cd-chest', 'cd-cross-arm', 'cd-triceps'],
+  },
+  {
+    id: 'gym-lower',
+    name: 'Gym: Lower Body & Glutes',
+    short: 'Gym lower',
+    minutes: [35, 45],
+    focus: 'Legs and glutes on the machines',
+    warmup: ['wu-hip-circles', 'wu-good-morning', 'wu-shoulder-rolls'],
+    exercises: ['goblet-squat', 'leg-extension', 'rdl', 'glute-bridge', 'sumo-squat', 'calf-raise'].map((moveId) => ({ moveId, sets: GYM_SETS })),
+    cooldown: ['cd-quad', 'cd-hamstring', 'cd-figure4'],
+  },
+];
+
+export const GYM_ROTATION = GYM_WORKOUTS.map((w) => w.id);
+
+export function gymWorkout(id: string): GymWorkout {
+  return GYM_WORKOUTS.find((w) => w.id === id) ?? GYM_WORKOUTS[0];
+}
+
+export function isGymWorkout(id: string) {
+  return GYM_ROTATION.includes(id);
+}
+
+// For history and headers, whichever kind it is
+export function workoutName(id: string) {
+  return isGymWorkout(id) ? gymWorkout(id).name : workout(id).name;
 }

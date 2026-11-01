@@ -6,20 +6,24 @@ import { GymCard } from '../../components/GymPicture';
 import PersonSwitch from '../../components/PersonSwitch';
 import { Badge, Button, Card, Chip, Muted, styles, Title } from '../../components/ui';
 import {
+  buildGymSteps,
   buildSteps,
   estimateMinutes,
+  GYM_REST_MACHINE,
+  GYM_REST_SET,
   isGymDay,
   LEVELS,
   levelAdvice,
   moveName,
+  nextGymWorkoutId,
   nextWorkoutId,
   PROGRAM_WEEKS,
   programDone,
   programWeek,
+  repsPerSide,
   Step,
-  usesGym,
 } from '../../her/engine';
-import { move, ROTATION, workout, WORKOUTS } from '../../her/program';
+import { GYM_ROTATION, GYM_SETS, gymWorkout, move, ROTATION, workout } from '../../her/program';
 import { clearHerActive, loadHerActive, loadHerSessions, loadHerSettings, saveHerActive, updateHerSettings } from '../../her/storage';
 import { HerSession, HerSettings, Level } from '../../her/types';
 import { herColors as colors } from '../../theme';
@@ -47,14 +51,13 @@ export default function HerTodayScreen() {
   const now = new Date();
   const atGym = gym ?? isGymDay(settings, now);
   const week = Math.min(programWeek(settings, now), PROGRAM_WEEKS);
-  const w = workout(nextWorkoutId(sessions, settings));
-  const steps = buildSteps(w, settings.level, week, atGym, sessions);
+  // Gym days get their own straight-set workouts; home days the circuits
+  const g = atGym ? gymWorkout(nextGymWorkoutId(sessions, settings)) : null;
+  const w = g ?? workout(nextWorkoutId(sessions, settings));
+  const steps = g ? buildGymSteps(g, sessions) : buildSteps(workout(w.id), settings.level, week, false, sessions);
   const advice = levelAdvice(sessions, settings);
   const spec = LEVELS[settings.level];
-  // Today's machines, in workout order, each once
-  const machines = [...new Set(steps.flatMap((s) => (s.kind === 'rest' ? [] : [s.moveId])))]
-    .map(move)
-    .filter((m) => usesGym(m, atGym));
+  const machines = g ? g.exercises.map((e) => move(e.moveId)) : [];
 
   async function change(c: Partial<HerSettings>) {
     setSettings(await updateHerSettings(c));
@@ -82,11 +85,12 @@ export default function HerTodayScreen() {
   const sections: { title: string; detail: string; rows: Step[] }[] = [];
   for (const s of steps) {
     if (s.kind === 'rest') continue;
-    const title = s.section === 'warmup' ? 'Warm-up' : s.section === 'cooldown' ? 'Cooldown' : s.circuit!;
+    const title = s.section === 'warmup' ? 'Warm-up' : s.section === 'cooldown' ? 'Cooldown' : g ? 'Machines' : s.circuit!;
     let sec = sections.at(-1);
     if (!sec || sec.title !== title) {
       const rounds = s.section === 'circuit' ? s.rounds! : 1;
-      sec = { title, detail: rounds > 1 ? `${rounds} rounds` : s.section === 'circuit' ? '1 round' : '', rows: [] };
+      const detail = g ? (s.section === 'circuit' ? `${GYM_SETS} sets each` : '') : rounds > 1 ? `${rounds} rounds` : s.section === 'circuit' ? '1 round' : '';
+      sec = { title, detail, rows: [] };
       sections.push(sec);
     }
     if (s.section !== 'circuit' || s.round === 1) sec.rows.push(s);
@@ -97,7 +101,7 @@ export default function HerTodayScreen() {
       <ScrollView contentContainerStyle={styles.screen}>
         <PersonSwitch current="her" />
         <Muted>
-          Week {week} of {PROGRAM_WEEKS} · Level {settings.level}, {spec.name}
+          Week {week} of {PROGRAM_WEEKS} · {g ? 'Gym day' : `Level ${settings.level}, ${spec.name}`}
         </Muted>
         <Title>{w.name}</Title>
         <Muted style={{ marginBottom: 14 }}>
@@ -144,7 +148,7 @@ export default function HerTodayScreen() {
             <Chip label="Home (dumbbells)" selected={!atGym} onPress={() => setGym(false)} />
             <Chip label="Full gym" selected={atGym} onPress={() => setGym(true)} />
           </View>
-          {atGym && <Muted>Moves with a machine or cable version use it today. {w.gymNote ?? ''}</Muted>}
+          {atGym && <Muted>Strength only, no cardio. Do all your sets on one machine, then move on to the next.</Muted>}
         </Card>
 
         {machines.length > 0 && (
@@ -171,14 +175,14 @@ export default function HerTodayScreen() {
               const m = move(s.moveId);
               const amount =
                 s.kind === 'reps'
-                  ? `${s.target} reps${m.perSide ? ' each side' : ''}${s.weight != null ? ` · ${s.weight} lb` : ''}`
+                  ? `${g ? `${s.rounds} × ` : ''}${s.target} reps${repsPerSide(s) ? ' each side' : ''}${s.weight != null ? ` · ${s.weight} lb` : ''}`
                   : m.perSide
                     ? `${s.seconds / 2} sec each side`
                     : `${s.seconds} sec`;
               return (
                 <View key={j} style={{ paddingVertical: 5 }}>
                   <Text style={styles.body}>
-                    {moveName(m, atGym)} <Text style={{ color: colors.muted }}>· {amount}</Text>
+                    {moveName(m, !!g)} <Text style={{ color: colors.muted }}>· {amount}</Text>
                   </Text>
                 </View>
               );
@@ -187,7 +191,9 @@ export default function HerTodayScreen() {
         ))}
 
         <Muted style={{ marginBottom: 12 }}>
-          {spec.restMove} sec rest between moves, {spec.restRound} sec between rounds. Take longer whenever you need it.
+          {g
+            ? `${GYM_REST_SET} sec rest between sets, ${GYM_REST_MACHINE} sec to get set up on the next machine. Take longer whenever you need it.`
+            : `${spec.restMove} sec rest between moves, ${spec.restRound} sec between rounds. Take longer whenever you need it.`}
         </Muted>
 
         <Button title={hasActive ? 'Start over with this workout' : 'Start workout'} onPress={startPressed} />
@@ -197,10 +203,10 @@ export default function HerTodayScreen() {
             <>
               <Muted style={{ marginBottom: 8 }}>Do a different workout instead. The order carries on from whatever you do.</Muted>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                {ROTATION.map((id) => workout(id)).map((x) => (
+                {(g ? GYM_ROTATION.map(gymWorkout) : ROTATION.map(workout)).map((x, i) => (
                   <Chip
                     key={x.id}
-                    label={`${WORKOUTS.indexOf(x) + 1}. ${x.short}`}
+                    label={g ? x.short : `${i + 1}. ${x.short}`}
                     selected={x.id === w.id}
                     onPress={() => {
                       change({ nextOverride: x.id });

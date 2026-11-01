@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { Card, Muted, styles, Title } from '../../components/ui';
 import { moveName } from '../../her/engine';
-import { move, workout } from '../../her/program';
+import { move, workoutName } from '../../her/program';
 import { deleteHerSession, loadHerSessions } from '../../her/storage';
 import { HerSession, MoveLog } from '../../her/types';
 import { herColors as colors } from '../../theme';
@@ -49,7 +49,7 @@ export default function HerHistoryScreen() {
             <Pressable key={s.id} onPress={() => setOpen(expanded ? null : s.id)} onLongPress={() => remove(s)}>
               <Card>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={[styles.h2, { flex: 1, marginRight: 8 }]}>{workout(s.workoutId).name}</Text>
+                  <Text style={[styles.h2, { flex: 1, marginRight: 8 }]}>{workoutName(s.workoutId)}</Text>
                   <Muted>{when.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</Muted>
                 </View>
                 <Muted style={{ marginTop: 2 }}>
