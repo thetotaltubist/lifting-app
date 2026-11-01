@@ -1,5 +1,5 @@
-import { DUMBBELLS, move, ROTATION } from './program';
-import { CheckIn, HerSession, HerSettings, Level, Move, MoveLog, Workout } from './types';
+import { DUMBBELLS, GYM_REPS, GYM_ROTATION, move, ROTATION } from './program';
+import { CheckIn, GymWorkout, HerSession, HerSettings, Level, Move, MoveLog, Workout } from './types';
 
 // ------------------------------------------------------------------
 // How her plan moves forward. Nothing gets harder on a schedule: the
@@ -49,13 +49,22 @@ export function finisherFor(w: Workout, week: number) {
 }
 
 // ---------- Next workout: always the next one in the rotation ----------
+// Home and gym workouts each keep their own order, so a gym weekend
+// doesn't skip anything at home
+
+function nextIn(rotation: string[], sessions: HerSession[], settings: HerSettings): string {
+  if (settings.nextOverride && rotation.includes(settings.nextOverride)) return settings.nextOverride;
+  const last = [...sessions].sort((a, b) => b.finishedAt.localeCompare(a.finishedAt)).find((s) => rotation.includes(s.workoutId));
+  if (!last) return rotation[0];
+  return rotation[(rotation.indexOf(last.workoutId) + 1) % rotation.length];
+}
 
 export function nextWorkoutId(sessions: HerSession[], settings: HerSettings): string {
-  if (settings.nextOverride && ROTATION.includes(settings.nextOverride)) return settings.nextOverride;
-  const last = [...sessions].sort((a, b) => b.finishedAt.localeCompare(a.finishedAt))[0];
-  if (!last) return ROTATION[0];
-  const i = ROTATION.indexOf(last.workoutId);
-  return ROTATION[(i + 1) % ROTATION.length];
+  return nextIn(ROTATION, sessions, settings);
+}
+
+export function nextGymWorkoutId(sessions: HerSession[], settings: HerSettings): string {
+  return nextIn(GYM_ROTATION, sessions, settings);
 }
 
 export function isGymDay(settings: HerSettings, now: Date) {
@@ -89,8 +98,8 @@ function dumbbellStep(weight: number, by: 1 | -1) {
   return [...DUMBBELLS].reverse().find((d) => d < weight) ?? null;
 }
 
-export function suggestMove(m: Move, gym: boolean, sessions: HerSession[]): MoveSuggestion {
-  const [lo, hi] = m.reps ?? [0, 0];
+export function suggestMove(m: Move, gym: boolean, sessions: HerSession[], range = m.reps): MoveSuggestion {
+  const [lo, hi] = range ?? [0, 0];
   const onGym = usesGym(m, gym);
   const last = lastLogs(m.id, onGym, sessions);
 
@@ -121,14 +130,14 @@ export function suggestMove(m: Move, gym: boolean, sessions: HerSession[]): Move
 
   if (allTop && c?.effort !== 'hard') {
     if (lastWeight == null) return { weight: null, reps: hi, why: 'You own the full range. Slow the lowering to 3 seconds to keep it challenging.' };
-    if (onGym) return { weight: lastWeight + 5, reps: lo, why: `You hit ${hi} every round. Up 5 lb.` };
+    if (onGym) return { weight: lastWeight + 5, reps: lo, why: `You hit ${hi} every time. Up 5 lb.` };
     const up = dumbbellStep(lastWeight, 1);
-    if (up) return { weight: up, reps: lo, why: `You hit ${hi} every round at ${lastWeight} lb. Try ${up} lb.` };
+    if (up) return { weight: up, reps: lo, why: `You hit ${hi} every time at ${lastWeight} lb. Try ${up} lb.` };
     return { weight: lastWeight, reps: hi, why: 'That is your heaviest dumbbell. Slow the lowering to 3 seconds to keep it challenging.' };
   }
 
   const target = Math.max(lo, Math.min(hi, minReps + 1));
-  return { weight: lastWeight, reps: target, why: `Same weight. Aim for ${target} reps every round.` };
+  return { weight: lastWeight, reps: target, why: `Same weight. Aim for ${target} reps every time.` };
 }
 
 // ---------- The guided workout, step by step ----------
@@ -151,6 +160,7 @@ export type Step =
       target: number;
       weight: number | null;
       why: string;
+      perSide?: boolean; // reps are for each side
       circuit: string;
       round: number;
       rounds: number;
@@ -179,7 +189,7 @@ export function buildSteps(w: Workout, level: Level, week: number, gym: boolean,
         const m = move(id);
         if (m.reps) {
           const s = suggestMove(m, gym, sessions);
-          steps.push({ kind: 'reps', section: 'circuit', moveId: id, reps: m.reps, target: s.reps, weight: s.weight, why: s.why, circuit: c.name, round: r, rounds });
+          steps.push({ kind: 'reps', section: 'circuit', moveId: id, reps: m.reps, target: s.reps, weight: s.weight, why: s.why, perSide: !!m.perSide, circuit: c.name, round: r, rounds });
         } else {
           const base = m.kind === 'cardio' ? spec.cardio : spec.core;
           steps.push({ kind: 'timed', section: 'circuit', moveId: id, seconds: base * (m.perSide ? 2 : 1), circuit: c.name, round: r, rounds });
@@ -196,9 +206,40 @@ export function buildSteps(w: Workout, level: Level, week: number, gym: boolean,
   return steps;
 }
 
+// Gym days: warm up, then every set on one machine before the next
+export const GYM_REST_SET = 60;
+export const GYM_REST_MACHINE = 90;
+
+export function buildGymSteps(w: GymWorkout, sessions: HerSession[]): Step[] {
+  const steps: Step[] = [];
+  for (const id of w.warmup) {
+    steps.push({ kind: 'timed', section: 'warmup', moveId: id, seconds: WARMUP_SECONDS * (move(id).perSide ? 2 : 1) });
+  }
+  w.exercises.forEach(({ moveId, sets }, i) => {
+    const m = move(moveId);
+    const name = moveName(m, true);
+    steps.push({ kind: 'rest', seconds: i === 0 ? 30 : GYM_REST_MACHINE, label: `Up next: ${name}. Set the seat and weight.` });
+    const s = suggestMove(m, true, sessions, GYM_REPS);
+    for (let set = 1; set <= sets; set++) {
+      if (set > 1) steps.push({ kind: 'rest', seconds: GYM_REST_SET, label: `Set ${set} of ${sets}. Stay on the machine.` });
+      steps.push({ kind: 'reps', section: 'circuit', moveId, reps: GYM_REPS, target: s.reps, weight: s.weight, why: s.why, perSide: false, circuit: name, round: set, rounds: sets });
+    }
+  });
+  steps.push({ kind: 'rest', seconds: 30, label: 'Up next: stretch' });
+  for (const id of w.cooldown) {
+    steps.push({ kind: 'timed', section: 'cooldown', moveId: id, seconds: move(id).perSide ? STRETCH_PER_SIDE * 2 : COOLDOWN_SECONDS });
+  }
+  return steps;
+}
+
+// Older saved workouts don't carry perSide on the step
+export function repsPerSide(s: Extract<Step, { kind: 'reps' }>) {
+  return s.perSide ?? !!move(s.moveId).perSide;
+}
+
 export function stepSeconds(s: Step) {
   if (s.kind !== 'reps') return s.seconds;
-  return s.target * SECONDS_PER_REP * (move(s.moveId).perSide ? 2 : 1);
+  return s.target * SECONDS_PER_REP * (repsPerSide(s) ? 2 : 1);
 }
 
 export function estimateMinutes(steps: Step[]) {

@@ -2,8 +2,8 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { buildSteps, estimateMinutes, finisherFor, levelAdvice, MIN_WORKOUTS_PER_LEVEL, nextWorkoutId, programWeek, suggestMove } from './engine';
-import { DUMBBELLS, move, MOVES, ROTATION, workout, WORKOUTS } from './program';
+import { buildGymSteps, buildSteps, estimateMinutes, finisherFor, levelAdvice, MIN_WORKOUTS_PER_LEVEL, nextGymWorkoutId, nextWorkoutId, programWeek, suggestMove } from './engine';
+import { DUMBBELLS, GYM_REPS, GYM_WORKOUTS, gymWorkout, move, MOVES, ROTATION, workout, WORKOUTS } from './program';
 import { CheckIn, HerSession, HerSettings, MoveLog } from './types';
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -159,4 +159,49 @@ test('every gym machine has start and finish photos', () => {
     assert.ok(MOVES.find((x) => x.id === id)?.gym, `${id} is not a gym move`);
     for (const i of [0, 1]) assert.ok(existsSync(new URL(`../../assets/gym/${id}-${i}.jpg`, import.meta.url)), `${id}-${i}.jpg missing`);
   }
+});
+
+test('gym days are straight sets of 12-15 on machines, with no cardio', () => {
+  for (const g of GYM_WORKOUTS) {
+    for (const id of [...g.warmup, ...g.cooldown]) assert.notEqual(move(id).kind, 'cardio', `${g.id}: ${id} is cardio`);
+    for (const e of g.exercises) assert.ok(move(e.moveId).gym, `${g.id}: ${e.moveId} has no machine version`);
+    const sets = buildGymSteps(g, []).filter((s) => s.kind === 'reps');
+    assert.equal(sets.length, g.exercises.reduce((t, e) => t + e.sets, 0));
+    // Every set on one machine before the next one
+    const order = sets.map((s) => s.moveId).filter((id, i, all) => id !== all[i - 1]);
+    assert.deepEqual(order, g.exercises.map((e) => e.moveId));
+    for (const s of sets) {
+      assert.deepEqual(s.kind === 'reps' && s.reps, GYM_REPS);
+      assert.equal(s.kind === 'reps' && s.perSide, false);
+    }
+    const min = estimateMinutes(buildGymSteps(g, []));
+    assert.ok(min >= g.minutes[0] - 5 && min <= g.minutes[1] + 5, `${g.id}: ${min} min`);
+  }
+});
+
+test('gym days split upper and lower with no muscle group on both', () => {
+  const upper = gymWorkout('gym-upper').exercises.map((e) => e.moveId);
+  const lower = gymWorkout('gym-lower').exercises.map((e) => e.moveId);
+  assert.equal(upper.filter((id) => lower.includes(id)).length, 0);
+  for (const id of upper) assert.ok(!['goblet-squat', 'rdl', 'glute-bridge', 'sumo-squat', 'calf-raise', 'leg-extension'].includes(id));
+});
+
+test('gym and home workouts keep their own order', () => {
+  assert.equal(nextGymWorkoutId([], settings), 'gym-upper');
+  const weekend = [session(0, 'upper', []), session(1, 'lower', []), session(2, 'gym-upper', [], fine, { gym: true })];
+  assert.equal(nextGymWorkoutId(weekend, settings), 'gym-lower');
+  // The gym day doesn't skip anything at home
+  assert.equal(nextWorkoutId(weekend, settings), 'cardio-core');
+  assert.equal(nextGymWorkoutId([...weekend, session(3, 'gym-lower', [], fine, { gym: true })], settings), 'gym-upper');
+});
+
+test('gym weights go up 5 lb once every set hits 15', () => {
+  const lat = move('single-row');
+  const first = suggestMove(lat, true, [], GYM_REPS);
+  assert.equal(first.weight, null);
+  assert.equal(first.reps, 12);
+  const done = [session(0, 'gym-upper', rounds('single-row', 50, [15, 15, 15], true), fine, { gym: true })];
+  assert.deepEqual([suggestMove(lat, true, done, GYM_REPS).weight, suggestMove(lat, true, done, GYM_REPS).reps], [55, 12]);
+  const close = [session(0, 'gym-upper', rounds('single-row', 50, [15, 13, 12], true), fine, { gym: true })];
+  assert.deepEqual([suggestMove(lat, true, close, GYM_REPS).weight, suggestMove(lat, true, close, GYM_REPS).reps], [50, 13]);
 });

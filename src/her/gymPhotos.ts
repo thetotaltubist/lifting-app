@@ -26,4 +26,5 @@ export const GYM_PHOTOS: Record<string, [number, number]> = {
   'reverse-lunge': [require('../../assets/gym/reverse-lunge-0.jpg'), require('../../assets/gym/reverse-lunge-1.jpg')],
   'calf-raise': [require('../../assets/gym/calf-raise-0.jpg'), require('../../assets/gym/calf-raise-1.jpg')],
   'glute-bridge': [require('../../assets/gym/glute-bridge-0.jpg'), require('../../assets/gym/glute-bridge-1.jpg')],
+  'leg-extension': [require('../../assets/gym/leg-extension-0.jpg'), require('../../assets/gym/leg-extension-1.jpg')],
 };

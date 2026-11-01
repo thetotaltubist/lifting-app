@@ -6,8 +6,8 @@ import * as Haptics from 'expo-haptics';
 import { beep, prepareBeeps } from '../beep';
 import { Button, Card, Chip, Muted, styles } from '../components/ui';
 import { GymPicture } from '../components/GymPicture';
-import { logFromStep, moveName, MoveStep, stepSeconds, usesGym } from '../her/engine';
-import { DUMBBELLS, move, workout } from '../her/program';
+import { logFromStep, moveName, MoveStep, repsPerSide, stepSeconds, usesGym } from '../her/engine';
+import { DUMBBELLS, isGymWorkout, move, workoutName } from '../her/program';
 import { clearHerActive, HerActive, loadHerActive, saveHerActive, saveHerSession, updateHerSettings } from '../her/storage';
 import { CheckIn, Effort, Form, HerSession, Recovery, Symptoms } from '../her/types';
 import { formatClock } from '../engine/rest';
@@ -120,7 +120,8 @@ export default function HerWorkoutScreen() {
   });
 
   if (!active) return null;
-  const w = workout(active.workoutId);
+  const title = workoutName(active.workoutId);
+  const gymDay = isGymWorkout(active.workoutId);
 
   function go(by: number) {
     setActive((a) => (a ? { ...a, index: Math.max(0, Math.min(a.steps.length, a.index + by)) } : a));
@@ -237,7 +238,9 @@ export default function HerWorkoutScreen() {
         ? 'Warm-up'
         : step.section === 'cooldown'
           ? 'Cooldown'
-          : `${step.circuit} · Round ${step.round} of ${step.rounds}`;
+          : gymDay
+            ? `Set ${step.round} of ${step.rounds}`
+            : `${step.circuit} · Round ${step.round} of ${step.rounds}`;
   const secondsLeft = step.kind === 'reps' ? 0 : left;
   const total = step.kind === 'reps' ? 0 : step.seconds;
   const timedPerSide = !!m?.perSide && step.kind === 'timed';
@@ -250,7 +253,7 @@ export default function HerWorkoutScreen() {
       </View>
       <ScrollView contentContainerStyle={styles.screen}>
         <Muted>
-          {w.name} · about {minutesLeft} min left
+          {title} · about {minutesLeft} min left
         </Muted>
         <Text style={{ color: colors.accent, fontWeight: '700', marginTop: 10 }}>{section}</Text>
 
@@ -261,6 +264,11 @@ export default function HerWorkoutScreen() {
               <Muted style={{ marginTop: 6 }}>
                 Next: {moveName(move(upcoming.moveId), active.gym)}. Take longer if you need it.
               </Muted>
+            )}
+            {gymDay && upcoming?.kind === 'reps' && upcoming.round === 1 && (
+              <View style={{ marginTop: 12, alignItems: 'center' }}>
+                <GymPicture moveId={upcoming.moveId} width={320} />
+              </View>
             )}
           </>
         ) : (
@@ -278,7 +286,7 @@ export default function HerWorkoutScreen() {
         {step.kind === 'reps' ? (
           <Card style={{ marginTop: 16 }}>
             <Text style={styles.h2}>
-              {step.target} reps{m!.perSide ? ' each side' : ''}
+              {step.target} reps{repsPerSide(step) ? ' each side' : ''}
             </Text>
             <Muted style={{ marginTop: 2, marginBottom: 12 }}>
               Range {step.reps[0]}-{step.reps[1]}. {step.why} Breathe out on the effort.
@@ -306,7 +314,7 @@ export default function HerWorkoutScreen() {
               </>
             )}
 
-            <Text style={[label, { marginTop: 8 }]}>Reps done{m!.perSide ? ' (each side)' : ''}</Text>
+            <Text style={[label, { marginTop: 8 }]}>Reps done{repsPerSide(step) ? ' (each side)' : ''}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <StepButton label="−" onPress={() => setReps((r) => Math.max(0, r - 1))} />
               <Text style={{ color: colors.text, fontSize: 28, fontWeight: '800', width: 64, textAlign: 'center', fontVariant: ['tabular-nums'] }}>{reps}</Text>
