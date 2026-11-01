@@ -104,7 +104,7 @@ export function suggestMove(m: Move, gym: boolean, sessions: HerSession[], range
   const last = lastLogs(m.id, onGym, sessions);
 
   if (!last) {
-    if (onGym) return { weight: null, reps: lo, why: 'First time on this one. Pick a weight you could lift about 20 times.' };
+    if (onGym) return { weight: null, reps: lo, why: `First time on this one. Pick a weight where the last few of ${hi} reps feel hard.` };
     if (m.start == null) return { weight: null, reps: lo, why: 'Bodyweight. Focus on smooth, controlled reps.' };
     return { weight: m.start, reps: lo, why: `Start with ${m.start} lb. If the last few reps feel easy, go up a dumbbell next time.` };
   }

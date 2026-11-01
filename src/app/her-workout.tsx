@@ -260,7 +260,7 @@ export default function HerWorkoutScreen() {
         {step.kind === 'rest' ? (
           <>
             <Text style={[styles.title, { marginTop: 4 }]}>{step.label}</Text>
-            {upcoming && (
+            {upcoming && !step.label.startsWith('Up next') && (
               <Muted style={{ marginTop: 6 }}>
                 Next: {moveName(move(upcoming.moveId), active.gym)}. Take longer if you need it.
               </Muted>
