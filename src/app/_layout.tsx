@@ -31,7 +31,7 @@ export default function RootLayout() {
         <Stack.Screen name="science" options={{ title: 'How the plan works' }} />
         <Stack.Screen name="program" options={{ title: 'Exercises' }} />
         <Stack.Screen name="new-exercise" options={{ title: 'Add your own', presentation: 'modal' }} />
-        <Stack.Screen name="week-summary" options={{ title: 'This week', presentation: 'modal' }} />
+        <Stack.Screen name="week-summary" options={{ title: 'Last 7 days', presentation: 'modal' }} />
         <Stack.Screen name="her" options={{ headerShown: false, animation: 'fade' }} />
         <Stack.Screen
           name="her-workout"

@@ -37,13 +37,13 @@ export default function WeekSummaryScreen() {
     <ScrollView contentContainerStyle={styles.screen}>
       <Title>Workout saved</Title>
       <Muted style={{ marginBottom: 14 }}>
-        {percent}% of this week&apos;s sets are done. Each slice fills as a muscle gets its sets. Green means that muscle is done for the week.
+        {percent}% of your weekly sets are done over the last 7 days. Each slice fills as a muscle gets its sets. Green means that muscle has hit its weekly target.
       </Muted>
       <Card>
         <WeekPie slices={rows.map((r) => ({ label: MUSCLE_NAMES[r.m], have: r.have, target: r.target }))} />
       </Card>
       <Card>
-        <Text style={styles.h2}>{left.length ? 'Still to do this week' : 'Every muscle is done for the week'}</Text>
+        <Text style={styles.h2}>{left.length ? 'Still to do (last 7 days)' : 'Every muscle is on target for the last 7 days'}</Text>
         {left.map((r) => (
           <View key={r.m} style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
             <Text style={styles.body}>{MUSCLE_NAMES[r.m]}</Text>

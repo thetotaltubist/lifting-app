@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import { alternativesFor, exercise, makeCustomExercise, painAreasFor, setCustomExercises } from './exercises';
 import { planNext, nextDayId, ROTATION } from './plan';
 import { suggest } from './progression';
+import { weeklyRecap } from './recap';
 import { rollingVolume, weeklyTarget } from './volume';
 import { formatClock, restSeconds } from './rest';
 import { HealthData, proteinTarget, shortNightStreak, weightTrend } from './health';
@@ -305,4 +306,22 @@ test('pain offers body parts for the day, and old shoulder logs still count', ()
   const old = doSession([], at(0), 10, 0);
   old[0].exercises[0] = { ...old[0].exercises[0], pain: undefined, shoulderPain: 6 };
   assert.equal(suggest('pl-incline-press', old, { comeback: false, deload: false }).weight, 90);
+});
+
+test('weekly recap uses fixed block weeks and skips the week in progress', () => {
+  let sessions: Session[] = [];
+  for (let d = 0; d < 7; d += 2) sessions = doSession(sessions, at(d + 0.1)); // week 1: days 0-6
+  sessions = doSession(sessions, at(8)); // week 2, still in progress
+  const recap = weeklyRecap(sessions, settings, at(9));
+  assert.equal(recap.length, 1);
+  assert.equal(recap[0].start.getTime(), start.getTime());
+  assert.equal(recap[0].workouts, 4);
+  assert.equal(recap[0].total, recap[0].rows.filter((r) => r.target > 0).length);
+  assert.ok(recap[0].hit <= recap[0].total);
+  const chest = recap[0].rows.find((r) => r.muscle === 'chest')!;
+  assert.equal(chest.target, weeklyTarget('chest', 'cut', 0, false));
+  // A later week with no workouts still shows, so a skipped week is visible
+  const later = weeklyRecap(sessions, settings, at(22));
+  assert.equal(later[0].workouts, 0);
+  assert.equal(later.length, 3);
 });
