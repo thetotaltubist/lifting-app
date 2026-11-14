@@ -2,6 +2,7 @@
   "expo": {
     "name": "Mayg & Jaown",
     "slug": "total-lift",
+    "owner": "jdicesar24",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "totallift",
@@ -16,7 +17,8 @@
       "fallbackToCacheTimeout": 0,
       "requestHeaders": {
         "expo-channel-name": "production"
-      }
+      },
+      "url": "https://u.expo.dev/f303b9de-420c-4c2b-a288-56d331bb608d"
     },
     "ios": {
       "bundleIdentifier": "com.jdicesar.totallift",
@@ -59,6 +61,11 @@
     ],
     "experiments": {
       "typedRoutes": false
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f303b9de-420c-4c2b-a288-56d331bb608d"
+      }
     }
   }
 }
