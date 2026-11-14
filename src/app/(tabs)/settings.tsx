@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { Alert, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PersonSwitch from '../../components/PersonSwitch';
+import AppVersion from '../../components/AppVersion';
 import { router, useFocusEffect } from 'expo-router';
 import { Button, Card, Chip, Muted, styles, Title } from '../../components/ui';
 import { day } from '../../engine/exercises';
@@ -123,6 +124,7 @@ export default function SettingsScreen() {
         </Card>
 
         <Button title="How the plan works" kind="plain" onPress={() => router.push('/science')} />
+        <AppVersion />
       </ScrollView>
     </SafeAreaView>
   );

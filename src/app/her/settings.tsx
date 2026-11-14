@@ -3,6 +3,7 @@ import { Alert, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import PersonSwitch from '../../components/PersonSwitch';
+import AppVersion from '../../components/AppVersion';
 import { Button, Card, Chip, Muted, styles, Title } from '../../components/ui';
 import { LEVELS, PROGRAM_WEEKS, programWeek } from '../../her/engine';
 import { loadHerSettings, updateHerSettings } from '../../her/storage';
@@ -90,6 +91,7 @@ export default function HerSettingsScreen() {
         </Card>
 
         <Muted>{"Your workouts are saved on this phone, separate from Jaown & Mayg's."}</Muted>
+        <AppVersion />
       </ScrollView>
     </SafeAreaView>
   );

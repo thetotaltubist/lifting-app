@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { hideSplash } from '../splash';
+import { startLaunchUpdateCheck } from '../updates';
 import { colors, hexColors, herColors } from '../theme';
 
 export default function RootLayout() {
@@ -12,7 +13,7 @@ export default function RootLayout() {
   const herHex = hexColors(scheme, 'her');
 
   useEffect(() => {
-    hideSplash();
+    hideSplash(startLaunchUpdateCheck());
   }, []);
 
   return (

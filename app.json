@@ -2,16 +2,29 @@
   "expo": {
     "name": "Mayg & Jaown",
     "slug": "total-lift",
+    "owner": "jdicesar24",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "totallift",
     "userInterfaceStyle": "automatic",
     "icon": "./assets/icon.png",
+    "runtimeVersion": {
+      "policy": "nativeVersion"
+    },
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "NEVER",
+      "fallbackToCacheTimeout": 0,
+      "requestHeaders": {
+        "expo-channel-name": "production"
+      },
+      "url": "https://u.expo.dev/f303b9de-420c-4c2b-a288-56d331bb608d"
+    },
     "ios": {
       "bundleIdentifier": "com.jdicesar.totallift",
       "supportsTablet": true,
       "appleTeamId": "7V9S64W92Z",
-      "buildNumber": "13",
+      "buildNumber": "14",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSHealthShareUsageDescription": "Mayg & Jaown reads your weight, sleep, HRV and resting heart rate to keep your cut from costing muscle. Nothing is written to Health.",
@@ -48,6 +61,11 @@
     ],
     "experiments": {
       "typedRoutes": false
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f303b9de-420c-4c2b-a288-56d331bb608d"
+      }
     }
   }
 }

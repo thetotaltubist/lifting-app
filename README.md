@@ -36,6 +36,20 @@ npx expo run:ios --device
 
 Pick your iPhone or iPad from the list (cable or the same Wi-Fi).
 
+## Over-the-air updates
+
+JS-only changes (screens, text, workouts, the training engine) can go straight to the phones without a new TestFlight build:
+
+```bash
+cd lifting-app
+git checkout main && git pull
+npm run ota -- "what changed"
+```
+
+The app checks for an update when it opens. If the download finishes while the loading screen is up, it restarts into it right away; otherwise the update is used the next time the app is opened fresh. Coming back to the app between sets checks again but never restarts it mid-workout. Settings shows the version, build and update date at the bottom.
+
+Each update only goes to the build number it was published for (runtime version is `version(buildNumber)`, e.g. `1.0.0(14)`). Anything native, like a new Expo module, a permission, the icon or the splash, still needs a new TestFlight build with a higher build number.
+
 ## Checks
 
 ```bash
