@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Alert, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PersonSwitch from '../../components/PersonSwitch';
 import AppVersion from '../../components/AppVersion';
@@ -7,6 +7,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { Button, Card, Chip, Muted, styles, Title } from '../../components/ui';
 import { day } from '../../engine/exercises';
 import { blockWeek, isDeload, rotationFor } from '../../engine/plan';
+import { daysFor, goalFor, goalInfo, programFor } from '../../engine/programs';
 import { colors } from '../../theme';
 import { Settings } from '../../engine/types';
 import { loadSettings, updateSettings } from '../../storage';
@@ -34,18 +35,6 @@ export default function SettingsScreen() {
     change({ rotation: next });
   }
 
-  function newBlock() {
-    Alert.alert('Start a new block?', 'Weekly targets go back to the low end and build up again over 4 weeks. You can change exercises next.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Start new block',
-        onPress: async () => {
-          await change({ blockStart: new Date().toISOString(), deloadStart: null });
-          router.push('/program');
-        },
-      },
-    ]);
-  }
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top']}>
@@ -54,7 +43,7 @@ export default function SettingsScreen() {
         <Title>Settings</Title>
 
         <Card>
-          <Text style={styles.h2}>Goal</Text>
+          <Text style={styles.h2}>Cut or build</Text>
           <Muted style={{ marginVertical: 8 }}>
             Cut keeps the weights heavy with moderate volume, which is enough to hold on to muscle while you lose fat. Build
             raises the weekly targets.
@@ -75,6 +64,9 @@ export default function SettingsScreen() {
 
         <Card>
           <Text style={styles.h2}>Training block</Text>
+          <Text style={[styles.body, { marginTop: 8 }]}>
+            {programFor(settings).name} · {goalInfo(goalFor(settings)).name} · {daysFor(settings)} days a week
+          </Text>
           <Muted style={{ marginVertical: 8 }}>
             {deload
               ? 'Deload week in progress. A new block starts when it ends.'
@@ -86,7 +78,7 @@ export default function SettingsScreen() {
             ) : (
               <Button title="Start deload week" kind="plain" onPress={() => change({ deloadStart: new Date().toISOString() })} />
             )}
-            <Button title="Start a new block" kind="plain" onPress={newBlock} />
+            <Button title="Start a new block" kind="plain" onPress={() => router.push('/new-block')} />
           </View>
         </Card>
 
@@ -123,7 +115,10 @@ export default function SettingsScreen() {
           <Button title="Change exercises" kind="plain" onPress={() => router.push('/program')} />
         </Card>
 
-        <Button title="How the plan works" kind="plain" onPress={() => router.push('/science')} />
+        <View style={{ gap: 8 }}>
+          <Button title="1 rep max calculator" kind="plain" onPress={() => router.push('/one-rm')} />
+          <Button title="How the plan works" kind="plain" onPress={() => router.push('/science')} />
+        </View>
         <AppVersion />
       </ScrollView>
     </SafeAreaView>

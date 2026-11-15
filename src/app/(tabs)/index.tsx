@@ -6,10 +6,14 @@ import { router, useFocusEffect } from 'expo-router';
 import { Badge, Button, Card, Chip, Muted, styles, Title } from '../../components/ui';
 import { day, exercise } from '../../engine/exercises';
 import { deloadSuggestion, Plan, planNext, rotationFor } from '../../engine/plan';
+import { programFor } from '../../engine/programs';
 import { Session, Settings } from '../../engine/types';
 import { loadActive, loadSessions, loadSettings, saveActive, toDisplay, updateSettings } from '../../storage';
 import { loadHealth, refreshHealth } from '../../health';
 import { colors } from '../../theme';
+
+// "5" rather than "5-5" for a fixed rep count
+const reps = (lo: number, hi: number) => (lo === hi ? String(lo) : `${lo}-${hi}`);
 
 export default function NextScreen() {
   const [plan, setPlan] = useState<Plan | null>(null);
@@ -89,7 +93,7 @@ export default function NextScreen() {
     <SafeAreaView style={{ flex: 1 }} edges={['top']}>
       <ScrollView contentContainerStyle={styles.screen}>
         <PersonSwitch current="john" />
-        <Muted>{plan.deload ? 'Deload week' : `Block week ${plan.blockWeek + 1} · ${settings.mode === 'cut' ? 'Cut' : 'Build'}`}</Muted>
+        <Muted>{plan.deload ? 'Deload week' : `Block week ${plan.blockWeek + 1}`} · {programFor(settings).name} · {settings.mode === 'cut' ? 'Cut' : 'Build'}</Muted>
         <Title>{plan.day.name}</Title>
         <Muted style={{ marginBottom: 14 }}>
           {plan.exercises.length} exercises · {totalSets} sets
@@ -109,7 +113,10 @@ export default function NextScreen() {
             <Muted style={{ marginVertical: 8 }}>
               Good time to change any exercises or machines, before you start building on new numbers.
             </Muted>
-            <Button title="Review exercises" kind="plain" onPress={() => router.push('/program')} />
+            <View style={{ gap: 8 }}>
+              <Button title="Review exercises" kind="plain" onPress={() => router.push('/program')} />
+              <Button title="About this program" kind="plain" onPress={() => router.push('/science')} />
+            </View>
           </Card>
         )}
 
@@ -137,7 +144,7 @@ export default function NextScreen() {
                 {e.catchUpSets > 0 && <Badge tone="warn" label={`+${e.catchUpSets} catch-up`} />}
               </View>
               <Text style={[styles.body, { marginTop: 4 }]}>
-                {e.sets} × {ex.repMin}-{ex.repMax}
+                {e.sets} × {reps(e.repMin ?? ex.repMin, e.repMax ?? ex.repMax)}
                 {w != null ? ` @ ${toDisplay(w, settings.unit)} ${settings.unit}` : ''} · {e.rirTarget} RIR
               </Text>
               <Muted style={{ marginTop: 4 }}>{e.suggestion.why}</Muted>

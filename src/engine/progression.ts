@@ -1,5 +1,6 @@
-import { exercise } from './exercises';
-import { LoggedExercise, Session } from './types';
+import { estimate1RM, weightForReps } from './oneRm';
+import { withGoalReps } from './programs';
+import { Goal, LoggedExercise, Session } from './types';
 
 // ------------------------------------------------------------------
 // Double progression: keep the weight until every working set reaches
@@ -64,15 +65,20 @@ function easier(weight: number, fraction: number, increment: number) {
   return roundTo(increment < 0 ? weight * (1 + fraction) : weight * (1 - fraction), increment);
 }
 
-export function suggest(exerciseId: string, sessions: Session[], opts: { comeback: boolean; deload: boolean }): Suggestion {
-  const e = exercise(exerciseId);
+export function suggest(
+  exerciseId: string,
+  sessions: Session[],
+  opts: { comeback: boolean; deload: boolean; goal?: Goal; reps?: [number, number] }
+): Suggestion {
+  const e = withGoalReps(exerciseId, opts.goal ?? 'hypertrophy', opts.reps);
+  const firstReps = Math.max(e.repMin, e.repMax - 2);
   const history = historyFor(exerciseId, sessions);
   const last = history[0];
   if (!last) {
     return {
       weight: null,
-      targetReps: e.repMax - 2,
-      why: `First time: pick a weight you could lift for about ${e.repMax - 2} reps with 2 left in the tank. The app takes it from there.`,
+      targetReps: firstReps,
+      why: `First time: pick a weight you could lift for about ${firstReps} reps with 2 left in the tank. The app takes it from there.`,
       swapSuggested: false,
       stalled: false,
     };
@@ -101,6 +107,22 @@ export function suggest(exerciseId: string, sessions: Session[], opts: { comebac
       targetReps: Math.min(minReps, e.repMax),
       why: `${where} was ${pain}/10 last time, so the weight holds until it settles.`,
       swapSuggested: prevPain >= 3,
+      stalled: false,
+    };
+  }
+
+  // The rep range changed a lot since last time (a new goal or 5x5), so
+  // last time's weight is no guide. Estimate a 1 rep max from the best
+  // set and start at a weight for the new reps with 2 in the tank.
+  // Assisted movements log assistance, not load, so they're left alone.
+  if (e.increment > 0 && (minReps > e.repMax + 2 || minReps < e.repMin - 2)) {
+    const best = Math.max(...sets.map((s) => estimate1RM(s.weight, s.reps)));
+    const start = roundTo(weightForReps(best, firstReps + 2), e.increment);
+    return {
+      weight: start,
+      targetReps: firstReps,
+      why: `New rep range (${e.repMin === e.repMax ? e.repMin : `${e.repMin}-${e.repMax}`}). From last time's ${weight} lb × ${minReps}, your estimated 1 rep max is about ${Math.round(best)} lb, so start at ${start} lb for ${firstReps} reps with 2 left in the tank.`,
+      swapSuggested: false,
       stalled: false,
     };
   }

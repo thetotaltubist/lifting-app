@@ -7,7 +7,7 @@ import { MUSCLE_NAMES } from '../../engine/exercises';
 import { blockWeek, isDeload } from '../../engine/plan';
 import { weeklyRecap } from '../../engine/recap';
 import { Muscle, Session, Settings } from '../../engine/types';
-import { rollingVolume, TARGETS, weeklyTarget } from '../../engine/volume';
+import { rollingVolume, TARGETS, targetFor } from '../../engine/volume';
 import { loadSessions, loadSettings } from '../../storage';
 import { colors } from '../../theme';
 
@@ -45,7 +45,7 @@ export default function VolumeScreen() {
         </Muted>
         <Card>
           {muscles.map((m) => {
-            const target = weeklyTarget(m, settings.mode, week, deload);
+            const target = targetFor(m, settings, week, deload);
             const have = done[m] ?? 0;
             const pct = Math.min(1, target ? have / target : 0);
             const tone = have >= target ? colors.good : have >= target * 0.7 ? colors.accent : colors.warn;

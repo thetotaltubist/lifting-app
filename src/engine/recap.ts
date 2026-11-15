@@ -1,6 +1,6 @@
 import { blockWeek } from './plan';
 import { Muscle, Session, Settings } from './types';
-import { addCredit, creditFor, DAY_MS, hardSets, TARGETS, weeklyTarget } from './volume';
+import { addCredit, creditFor, DAY_MS, hardSets, TARGETS, targetFor } from './volume';
 
 // ------------------------------------------------------------------
 // Weekly recap: how each finished week went against its targets.
@@ -46,7 +46,7 @@ export function weeklyRecap(sessions: Session[], settings: Settings, now: Date, 
     for (const s of inWeek) for (const ex of s.exercises) addCredit(done, creditFor(ex.exerciseId, hardSets(ex)));
     const deload = inWeek.some((s) => s.deload);
     const bw = blockWeek(settings, new Date(start));
-    const rows = muscles.map((m) => ({ muscle: m, have: done[m] ?? 0, target: weeklyTarget(m, settings.mode, bw, deload) }));
+    const rows = muscles.map((m) => ({ muscle: m, have: done[m] ?? 0, target: targetFor(m, settings, bw, deload) }));
     const total = rows.filter((r) => r.target > 0).length;
     const hit = rows.filter((r) => r.target > 0 && r.have >= r.target).length;
     out.push({ start: new Date(start), end: new Date(end), workouts: inWeek.length, deload, hit, total, rows });

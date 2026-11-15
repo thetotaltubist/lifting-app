@@ -33,7 +33,9 @@ export type Exercise = {
 export type DayTemplate = {
   id: string;
   name: string;
-  exercises: { exerciseId: string; baseSets: number }[];
+  // reps overrides the goal's rep range for this slot (5x5 is always 5)
+  exercises: { exerciseId: string; baseSets: number; reps?: [number, number] }[];
+  painAreas?: string[]; // body parts offered for a pain rating; missing uses the day id
 };
 
 export type LoggedSet = {
@@ -63,6 +65,10 @@ export type Session = {
 
 export type Mode = 'cut' | 'build';
 
+// What the block is for. Changes reps, rest, how close to failure, and
+// how many weekly sets the app aims for. See programs.ts.
+export type Goal = 'strength' | 'hypertrophy' | 'endurance';
+
 export type Settings = {
   mode: Mode;
   unit: 'lb' | 'kg';
@@ -72,5 +78,8 @@ export type Settings = {
   swaps: Record<string, string>; // template exercise id -> replacement id, on every day it appears
   customExercises: Exercise[]; // exercises and machines John added himself
   nextDayOverride: string | null;
-  rotation?: string[]; // day ids in John's order; missing means the default
+  rotation?: string[]; // day ids in John's order; missing means the program's order
+  program?: string; // program id; missing means Push / Pull / Legs
+  goal?: Goal; // missing means hypertrophy
+  daysPerWeek?: number; // how many days a week he plans to lift; missing means 5
 };

@@ -26,7 +26,37 @@ export const SCIENCE: { title: string; body: string; strength: 'Strong' | 'Moder
     title: 'How often to train a muscle',
     strength: 'Moderate',
     body:
-      'Training a muscle about twice a week works at least as well as once. Beyond that, total weekly sets matter more than how they are split up. Your rotation hits each muscle about 1.7 times a week at 5 sessions.',
+      'Training a muscle about twice a week works at least as well as once. Beyond that, total weekly sets matter more than how they are split up. The app works out how often each muscle comes up from your program and the days a week you plan to lift.',
+  },
+  {
+    title: 'Choosing a split',
+    strength: 'Moderate',
+    body:
+      'When weekly sets are the same, full body, upper / lower, push / pull / legs and body-part splits all build similar muscle. One study in trained men found a small edge for full body 3 times a week over a once-a-week split. So the best split is the one that fits the days you can actually lift: full body for 2 to 3 days, upper / lower for 4, and the longer splits for 5 or 6.',
+  },
+  {
+    title: 'Strength, size or endurance',
+    strength: 'Strong',
+    body:
+      'Heavy sets of about 1 to 6 reps build the most strength. Muscle grows about the same across roughly 5 to 30 reps when sets are hard. Sets of 15 or more with short rest build local endurance best. The goal you pick for a block sets the reps, rest and how close to failure you go.',
+  },
+  {
+    title: 'Fewer sets for strength',
+    strength: 'Moderate',
+    body:
+      'Strength keeps improving with more sets, but it levels off sooner than size does, and even a few heavy sets a week make trained lifters stronger. So a strength block aims for about 30% fewer weekly sets than a hypertrophy block, and heavy sets stay 2 to 3 reps short of failure, since going all the way adds little strength.',
+  },
+  {
+    title: 'Fewer days a week',
+    strength: 'Moderate',
+    body:
+      'Muscle still grows on fewer than 5 sets per muscle a week, just less than on more. With 2 to 4 days the app aims for fewer weekly sets (about half at 2 days) so each session stays a sensible length. If you plan more days than you get to, catch-up sets make up some of the difference.',
+  },
+  {
+    title: 'Short rest for endurance',
+    strength: 'Moderate',
+    body:
+      'Long rest helps strength and size. For local endurance, short rest of about a minute is the point: training while partly tired is what builds the ability to keep going. An endurance block uses about 60 seconds between sets.',
   },
   {
     title: 'Catch-up and the per-session limit',
@@ -57,6 +87,12 @@ export const SCIENCE: { title: string; body: string; strength: 'Strong' | 'Moder
     strength: 'Strong',
     body:
       'Double progression: keep the weight until every set hits the top of the rep range, then add weight and start at the bottom. In a cut, holding your weights is a win. The app flags a stall only after 3 sessions without progress.',
+  },
+  {
+    title: 'Estimating your 1 rep max',
+    strength: 'Moderate',
+    body:
+      'A set of a few reps close to failure predicts your 1 rep max well, usually within a few percent up to about 10 reps, so there is no need to test a true max. The app averages two common formulas (Epley and Brzycki). When a new block changes your rep range, it uses this estimate to pick a starting weight for the new reps with 2 left in the tank.',
   },
   {
     title: 'Deloads',
@@ -106,5 +142,13 @@ export const REFERENCES = [
   'Kiviniemi AM, Hautala AJ, Kinnunen H, Tulppo MP. Endurance training guided individually by daily heart rate variability measurements. Eur J Appl Physiol. 2007;101(6):743-751.',
   'Schoenfeld BJ, Pope ZK, Benik FM, et al. Longer interset rest periods enhance muscle strength and hypertrophy in resistance-trained men. J Strength Cond Res. 2016;30(7):1805-1812.',
   'Grgic J, Lazinica B, Mikulic P, Krieger JW, Schoenfeld BJ. The effects of short versus long inter-set rest intervals in resistance training on measures of muscle hypertrophy: a systematic review. Eur J Sport Sci. 2017;17(8):983-993.',
+  'Schoenfeld BJ, Ratamess NA, Peterson MD, Contreras B, Tiryaki-Sonmez G. Influence of resistance training frequency on muscular adaptations in well-trained men. J Strength Cond Res. 2015;29(7):1821-1829.',
+  'Grgic J, Schoenfeld BJ, Davies TB, Lazinica B, Krieger JW, Pedisic Z. Effect of resistance training frequency on gains in muscular strength: a systematic review and meta-analysis. Sports Med. 2018;48(5):1207-1220.',
+  'Ralston GW, Kilgore L, Wyatt FB, Baker JS. The effect of weekly set volume on strength gain: a meta-analysis. Sports Med. 2017;47(12):2585-2601.',
+  'Androulakis-Korakakis P, Fisher JP, Steele J. The minimum effective training dose required to increase 1RM strength in resistance-trained men: a systematic review and meta-analysis. Sports Med. 2020;50(4):751-765.',
+  'Grgic J, Schoenfeld BJ, Orazem J, Sabol F. Effects of resistance training performed to repetition failure or non-failure on muscular strength and hypertrophy: a systematic review and meta-analysis. J Sport Health Sci. 2022;11(2):202-211.',
+  'Campos GER, Luecke TJ, Wendeln HK, et al. Muscular adaptations in response to three different resistance-training regimens: specificity of repetition maximum training zones. Eur J Appl Physiol. 2002;88(1-2):50-60.',
+  'de Salles BF, Simão R, Miranda F, et al. Rest interval between sets in strength training. Sports Med. 2009;39(9):765-777.',
+  'LeSuer DA, McCormick JH, Mayhew JL, Wasserstein RL, Arnold MD. The accuracy of prediction equations for estimating 1-RM performance in the bench press, squat, and deadlift. J Strength Cond Res. 1997;11(4):211-213.',
   'Morton RW, Murphy KT, McKellar SR, et al. A systematic review, meta-analysis and meta-regression of the effect of protein supplementation on resistance training-induced gains in muscle mass and strength. Br J Sports Med. 2018;52(6):376-384.',
 ];

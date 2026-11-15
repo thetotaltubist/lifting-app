@@ -1,5 +1,6 @@
 import { exercise } from './exercises';
-import { LoggedExercise, Mode, Muscle, Session } from './types';
+import { daysFor, daysVolume, GOAL_VOLUME, goalFor } from './programs';
+import { Goal, LoggedExercise, Mode, Muscle, Session, Settings } from './types';
 
 // ------------------------------------------------------------------
 // Weekly hard-set targets and the rolling 7-day count.
@@ -13,6 +14,8 @@ import { LoggedExercise, Mode, Muscle, Session } from './types';
 // count as half, so a lower target filled up after one push and one pull
 // day. See science.ts.
 // Front delts have no target of their own; pressing covers them.
+// These are the hypertrophy numbers at 5-6 days a week. Strength and
+// endurance aim for a share of them, and so do shorter weeks (programs.ts).
 // ------------------------------------------------------------------
 
 export const TARGETS: Record<Mode, Partial<Record<Muscle, [number, number]>>> = {
@@ -46,13 +49,25 @@ export const TARGETS: Record<Mode, Partial<Record<Muscle, [number, number]>>> = 
 
 export const RAMP_WEEKS = 4; // weeks to go from the low end to the peak
 
-export function weeklyTarget(muscle: Muscle, mode: Mode, blockWeek: number, deload: boolean): number {
+export function weeklyTarget(
+  muscle: Muscle,
+  mode: Mode,
+  blockWeek: number,
+  deload: boolean,
+  opts: { goal?: Goal; daysPerWeek?: number } = {}
+): number {
   const range = TARGETS[mode][muscle];
   if (!range) return 0;
+  const scale = GOAL_VOLUME[opts.goal ?? 'hypertrophy'] * daysVolume(opts.daysPerWeek ?? 5);
   const [lo, hi] = range;
-  if (deload) return Math.round(lo / 2);
+  if (deload) return Math.round((lo * scale) / 2);
   const t = Math.min(Math.max(blockWeek, 0), RAMP_WEEKS) / RAMP_WEEKS;
-  return Math.round(lo + (hi - lo) * t);
+  return Math.round((lo + (hi - lo) * t) * scale);
+}
+
+// The target for this block's goal and days a week
+export function targetFor(muscle: Muscle, settings: Settings, blockWeek: number, deload: boolean) {
+  return weeklyTarget(muscle, settings.mode, blockWeek, deload, { goal: goalFor(settings), daysPerWeek: daysFor(settings) });
 }
 
 export const DAY_MS = 24 * 60 * 60 * 1000;
