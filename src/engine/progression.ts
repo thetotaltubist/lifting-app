@@ -1,5 +1,5 @@
-import { exercise } from './exercises';
-import { LoggedExercise, Session } from './types';
+import { withGoalReps } from './programs';
+import { Goal, LoggedExercise, Session } from './types';
 
 // ------------------------------------------------------------------
 // Double progression: keep the weight until every working set reaches
@@ -64,15 +64,20 @@ function easier(weight: number, fraction: number, increment: number) {
   return roundTo(increment < 0 ? weight * (1 + fraction) : weight * (1 - fraction), increment);
 }
 
-export function suggest(exerciseId: string, sessions: Session[], opts: { comeback: boolean; deload: boolean }): Suggestion {
-  const e = exercise(exerciseId);
+export function suggest(
+  exerciseId: string,
+  sessions: Session[],
+  opts: { comeback: boolean; deload: boolean; goal?: Goal; reps?: [number, number] }
+): Suggestion {
+  const e = withGoalReps(exerciseId, opts.goal ?? 'hypertrophy', opts.reps);
+  const firstReps = Math.max(e.repMin, e.repMax - 2);
   const history = historyFor(exerciseId, sessions);
   const last = history[0];
   if (!last) {
     return {
       weight: null,
-      targetReps: e.repMax - 2,
-      why: `First time: pick a weight you could lift for about ${e.repMax - 2} reps with 2 left in the tank. The app takes it from there.`,
+      targetReps: firstReps,
+      why: `First time: pick a weight you could lift for about ${firstReps} reps with 2 left in the tank. The app takes it from there.`,
       swapSuggested: false,
       stalled: false,
     };

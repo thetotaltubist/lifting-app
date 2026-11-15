@@ -6,7 +6,7 @@ import { Button, Card, Muted, styles, Title } from '../components/ui';
 import { MUSCLE_NAMES } from '../engine/exercises';
 import { blockWeek, isDeload } from '../engine/plan';
 import { Muscle, Session, Settings } from '../engine/types';
-import { rollingVolume, TARGETS, weeklyTarget } from '../engine/volume';
+import { rollingVolume, TARGETS, targetFor } from '../engine/volume';
 import { loadSessions, loadSettings } from '../storage';
 import { colors } from '../theme';
 
@@ -26,7 +26,7 @@ export default function WeekSummaryScreen() {
   const week = blockWeek(settings, now);
   const deload = isDeload(settings, now);
   const muscles = Object.keys(TARGETS[settings.mode]) as Muscle[];
-  const rows = muscles.map((m) => ({ m, have: done[m] ?? 0, target: weeklyTarget(m, settings.mode, week, deload) }));
+  const rows = muscles.map((m) => ({ m, have: done[m] ?? 0, target: targetFor(m, settings, week, deload) }));
   const totalTarget = rows.reduce((t, r) => t + r.target, 0);
   const totalDone = rows.reduce((t, r) => t + Math.min(r.have, r.target), 0);
   const percent = totalTarget ? Math.round((totalDone / totalTarget) * 100) : 100;

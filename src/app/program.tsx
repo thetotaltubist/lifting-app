@@ -2,7 +2,8 @@ import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { Badge, Card, Muted, styles } from '../components/ui';
-import { alternativesFor, DAYS, exercise, MUSCLE_NAMES } from '../engine/exercises';
+import { alternativesFor, day, exercise, MUSCLE_NAMES } from '../engine/exercises';
+import { programFor } from '../engine/programs';
 import { Settings } from '../engine/types';
 import { loadSettings, updateSettings } from '../storage';
 import { colors } from '../theme';
@@ -38,7 +39,7 @@ export default function ProgramScreen() {
         Tap an exercise to replace it. A replacement works the same main muscle and applies everywhere that exercise shows up. The
         start of a block is a good time to change things, so progress stays easy to compare within a block.
       </Muted>
-      {DAYS.map((d) => {
+      {programFor(settings).days.map(day).map((d) => {
         const inDay = d.exercises.map((x) => settings.swaps[x.exerciseId] ?? x.exerciseId);
         return (
           <Card key={d.id}>

@@ -1,11 +1,12 @@
 /// <reference types="node" />
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { alternativesFor, exercise, makeCustomExercise, painAreasFor, setCustomExercises } from './exercises';
-import { planNext, nextDayId, ROTATION } from './plan';
+import { alternativesFor, day, exercise, makeCustomExercise, painAreasFor, setCustomExercises } from './exercises';
+import { planNext, nextDayId, ROTATION, rotationFor } from './plan';
+import { PROGRAMS, suggestPrograms, withGoalReps } from './programs';
 import { suggest } from './progression';
 import { weeklyRecap } from './recap';
-import { rollingVolume, weeklyTarget } from './volume';
+import { rollingVolume, targetFor, weeklyTarget } from './volume';
 import { formatClock, restSeconds } from './rest';
 import { HealthData, proteinTarget, shortNightStreak, weightTrend } from './health';
 import { Session, Settings } from './types';
@@ -324,4 +325,109 @@ test('weekly recap uses fixed block weeks and skips the week in progress', () =>
   const later = weeklyRecap(sessions, settings, at(22));
   assert.equal(later[0].workouts, 0);
   assert.equal(later.length, 3);
+});
+
+// ---------- Programs, goals and days a week ----------
+
+const withProgram = (program: string, goal: Settings['goal'], daysPerWeek: number): Settings => ({ ...settings, program, goal, daysPerWeek });
+
+test('every program day and exercise exists', () => {
+  for (const p of PROGRAMS) {
+    for (const id of p.days) {
+      const d = day(id);
+      assert.ok(d.exercises.length > 0, id);
+      for (const x of d.exercises) assert.notEqual(exercise(x.exerciseId).name, 'Removed exercise', `${id} ${x.exerciseId}`);
+      assert.ok(painAreasFor(id).length > 0, id);
+    }
+  }
+});
+
+test('suggested programs follow the goal and days a week', () => {
+  const best = (g: Settings['goal'], d: number) => suggestPrograms(g!, d)[0];
+  for (const g of ['strength', 'hypertrophy', 'endurance'] as const) assert.equal(best(g, 2).program.id, 'full-body');
+  assert.equal(best('strength', 3).program.id, 'five-by-five');
+  assert.equal(best('hypertrophy', 3).program.id, 'full-body');
+  assert.equal(best('hypertrophy', 4).program.id, 'upper-lower');
+  assert.equal(best('hypertrophy', 6).program.id, 'ppl');
+  assert.equal(best('hypertrophy', 4).fit, 'best');
+  // 5x5 is strength only, so it never fits a hypertrophy block
+  assert.equal(suggestPrograms('hypertrophy', 3).find((f) => f.program.id === 'five-by-five')!.fit, 'other');
+});
+
+test('no program, goal or days saved means the original plan', () => {
+  assert.equal(rotationFor(settings).join(), ROTATION.join());
+  assert.equal(weeklyTarget('chest', 'cut', 0, false), weeklyTarget('chest', 'cut', 0, false, { goal: 'hypertrophy', daysPerWeek: 5 }));
+});
+
+test('strength uses heavier reps and fewer sets; endurance uses higher reps and short rest', () => {
+  const strength = withProgram('upper-lower', 'strength', 4);
+  const plan = planNext([], strength, at(0));
+  const press = plan.exercises.find((e) => e.exerciseId === 'pl-incline-press')!;
+  assert.deepEqual([press.repMin, press.repMax], [4, 6]);
+  assert.ok(targetFor('chest', strength, 4, false) < targetFor('chest', withProgram('upper-lower', 'hypertrophy', 4), 4, false));
+  assert.equal(withGoalReps('cable-fly', 'endurance').repMin, 15);
+  assert.equal(restSeconds(withGoalReps('hack-squat', 'endurance'), 2, false, 'endurance'), 60);
+  assert.equal(restSeconds(withGoalReps('hack-squat', 'strength'), 2, false, 'strength'), 180);
+});
+
+test('fewer days a week aims for fewer weekly sets', () => {
+  const t = (d: number) => targetFor('quads', withProgram('full-body', 'hypertrophy', d), 4, false);
+  assert.ok(t(2) < t(3) && t(3) < t(4) && t(4) < t(5));
+  assert.equal(t(5), t(6));
+});
+
+test('5x5 keeps 5 sets of 5 and never adds catch-up', () => {
+  const s = withProgram('five-by-five', 'strength', 3);
+  let sessions: Session[] = [];
+  for (let d = 0; d < 21; d += 4) {
+    // Fewer sessions than planned, so a volume program would add catch-up here
+    const plan = planNext(sessions, s, at(d));
+    assert.ok(plan.day.id.startsWith('five-'));
+    for (const e of plan.exercises) {
+      assert.equal(e.catchUpSets, 0);
+      assert.deepEqual([e.repMin, e.repMax], [5, 5]);
+      assert.equal(e.sets, e.exerciseId === 'trap-bar-deadlift' ? 1 : 5);
+    }
+    sessions = [
+      ...sessions,
+      {
+        id: `f${d}`,
+        dayId: plan.day.id,
+        startedAt: at(d).toISOString(),
+        finishedAt: at(d).toISOString(),
+        exercises: plan.exercises.map((e) => ({ exerciseId: e.exerciseId, sets: Array.from({ length: e.sets }, () => ({ weight: 135, reps: 5, rir: 2, done: true })) })),
+      },
+    ];
+  }
+  // All 5 reps on every set: the weight goes up
+  assert.equal(planNext(sessions, s, at(22)).exercises.find((e) => e.exerciseId === 'barbell-squat')!.suggestion.weight, 140);
+});
+
+test('plan 6 days but lift 4, and catch-up makes up the difference', () => {
+  const s = withProgram('ppl', 'hypertrophy', 6);
+  let sessions: Session[] = [];
+  let added = 0;
+  for (let d = 0; d < 28; d++) {
+    if (![0, 1, 3, 4].includes(d % 7)) continue;
+    const plan = planNext(sessions, s, at(d));
+    if (d >= 7) added += plan.exercises.reduce((t, e) => t + e.catchUpSets, 0);
+    sessions = [
+      ...sessions,
+      {
+        id: `p${d}`,
+        dayId: plan.day.id,
+        startedAt: at(d).toISOString(),
+        finishedAt: at(d).toISOString(),
+        exercises: plan.exercises.map((e) => ({ exerciseId: e.exerciseId, sets: Array.from({ length: e.sets }, () => ({ weight: 100, reps: 10, rir: 2, done: true })) })),
+      },
+    ];
+  }
+  assert.ok(added > 0);
+});
+
+test('a new program starts at its own first day', () => {
+  const s = withProgram('upper-lower', 'hypertrophy', 4);
+  const old = doSession([], at(0)); // a Push / Pull / Legs day
+  assert.equal(nextDayId(old, s), 'upper-a');
+  assert.deepEqual(rotationFor({ ...s, rotation: ROTATION }), PROGRAMS.find((p) => p.id === 'upper-lower')!.days);
 });

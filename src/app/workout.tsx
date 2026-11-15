@@ -6,6 +6,7 @@ import * as Haptics from 'expo-haptics';
 import RestTimer, { Rest } from '../components/RestTimer';
 import { Badge, Button, Card, Chip, Muted, styles } from '../components/ui';
 import { alternativesFor, exercise, painAreasFor } from '../engine/exercises';
+import { goalFor, withGoalReps } from '../engine/programs';
 import { suggest } from '../engine/progression';
 import { restReason, restSeconds } from '../engine/rest';
 import { cancelRestAlert, scheduleRestAlert } from '../restAlert';
@@ -98,6 +99,15 @@ export default function WorkoutScreen() {
 
   if (!active || !settings) return null;
   const unit = settings.unit;
+  const goal = goalFor(settings);
+
+  // Reps for this block's goal. The plan's own range wins while it's the
+  // same exercise (5x5 keeps 5 reps); a swap mid-workout uses the goal's.
+  function liftFor(i: number, id: string) {
+    const p = active!.plan.exercises[i];
+    if (p && p.exerciseId === id && p.repMin != null && p.repMax != null) return { ...exercise(id), repMin: p.repMin, repMax: p.repMax };
+    return withGoalReps(id, goal);
+  }
 
   function changeExercise(i: number, change: (ex: LoggedExercise) => LoggedExercise) {
     setActive((a) => (a ? { ...a, exercises: a.exercises.map((ex, k) => (k === i ? change(ex) : ex)) } : a));
@@ -127,7 +137,7 @@ export default function WorkoutScreen() {
     if (set.done) return;
 
     // Start the rest timer for whatever comes next
-    const e = exercise(ex.exerciseId);
+    const e = liftFor(i, ex.exerciseId);
     const nextSet = ex.sets.findIndex((s, k) => k !== j && !s.done);
     const nextExercise = active!.exercises.find((x, k) => k > i && x.sets.some((s) => !s.done));
     const next =
@@ -136,8 +146,8 @@ export default function WorkoutScreen() {
       stopRest();
       return;
     }
-    const seconds = restSeconds(e, set.rir, active!.deload);
-    setRest({ endAt: Date.now() + seconds * 1000, total: seconds, reason: restReason(e, set.rir, active!.deload) });
+    const seconds = restSeconds(e, set.rir, active!.deload, goal);
+    setRest({ endAt: Date.now() + seconds * 1000, total: seconds, reason: restReason(e, set.rir, active!.deload, goal) });
     scheduleRestAlert(seconds, next);
   }
 
@@ -163,9 +173,9 @@ export default function WorkoutScreen() {
       scheduleRestAlert((rest.endAt - Date.now()) / 1000, next);
       return;
     }
-    const e = exercise(ex.exerciseId);
-    const seconds = restSeconds(e, last.rir, active!.deload);
-    setRest({ endAt: Date.now() + seconds * 1000, total: seconds, reason: restReason(e, last.rir, active!.deload) });
+    const e = liftFor(i, ex.exerciseId);
+    const seconds = restSeconds(e, last.rir, active!.deload, goal);
+    setRest({ endAt: Date.now() + seconds * 1000, total: seconds, reason: restReason(e, last.rir, active!.deload, goal) });
     scheduleRestAlert(seconds, next);
   }
 
@@ -181,7 +191,7 @@ export default function WorkoutScreen() {
       ...options.map((o) => ({
         text: o.name,
         onPress: () => {
-          const s = suggest(o.id, sessions, { comeback: active!.plan.comeback, deload: active!.deload });
+          const s = suggest(o.id, sessions, { comeback: active!.plan.comeback, deload: active!.deload, goal });
           const apply = () =>
             changeExercise(i, (e) => ({
               ...e,
@@ -254,7 +264,7 @@ export default function WorkoutScreen() {
       <ScrollView contentContainerStyle={styles.screen} keyboardShouldPersistTaps="handled">
         <Text style={[styles.h2, { fontSize: 24, marginBottom: 12 }]}>{active.plan.day.name}</Text>
         {active.exercises.map((ex, i) => {
-          const e = exercise(ex.exerciseId);
+          const e = liftFor(i, ex.exerciseId);
           const planned = active.plan.exercises[i];
           return (
             <Card key={i}>
@@ -266,7 +276,7 @@ export default function WorkoutScreen() {
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4, marginBottom: 10 }}>
                 <Muted>
-                  {e.repMin}-{e.repMax} reps · {planned?.rirTarget ?? '1-2'} in reserve
+                  {e.repMin === e.repMax ? e.repMin : `${e.repMin}-${e.repMax}`} reps · {planned?.rirTarget ?? '1-2'} in reserve
                   {planned?.suggestion.targetReps ? ` · aim ${planned.suggestion.targetReps}+` : ''}
                 </Muted>
                 {(ex.catchUpSets ?? 0) > 0 && (

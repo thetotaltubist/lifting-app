@@ -1,8 +1,9 @@
 import { DAYS, day, exercise } from './exercises';
 import { catchUpPause, HealthData } from './health';
+import { daysFor, goalFor, programFor, withGoalReps } from './programs';
 import { suggest, Suggestion } from './progression';
-import { DAY_MS, addCredit, creditFor, rollingVolume, weeklyTarget } from './volume';
-import { DayTemplate, Muscle, Session, Settings } from './types';
+import { DAY_MS, addCredit, creditFor, rollingVolume, targetFor } from './volume';
+import { DayTemplate, Goal, Muscle, Session, Settings } from './types';
 
 // ------------------------------------------------------------------
 // Builds the next workout.
@@ -10,7 +11,10 @@ import { DayTemplate, Muscle, Session, Settings } from './types';
 // 1. Pick the next day in the rotation (no calendar).
 // 2. For each muscle that day trains, compare the last 7 days of hard sets
 //    with the weekly target. A normal session gives the target divided by
-//    how often that muscle comes up in a week (about 1.7 times at 5 sessions).
+//    how often that muscle comes up in a week: how many of the program's
+//    days train it, times the days a week John plans to lift. Plan 6 and
+//    lift 4, and the muscles that fell behind get catch-up sets.
+//    Fixed programs (5x5) keep their own sets and skip catch-up.
 // 3. If a muscle is behind (missed days), add catch-up sets: at most 3 per
 //    muscle per session, and never more than 10 for one muscle in a
 //    session. The rest carries to the next time that muscle comes up.
@@ -30,13 +34,13 @@ export const MAX_SETS_PER_MUSCLE_SESSION = 10;
 export const MIN_DIRECT_SETS = 3;
 export const COMEBACK_GAP_DAYS = 3;
 export const DELOAD_DAYS = 7;
-export const ROTATION = DAYS.map((d) => d.id);
-export const SESSIONS_PER_WEEK = 5; // the plan assumes at least 5 sessions a week
+export const ROTATION = DAYS.map((d) => d.id); // the original Push / Pull / Legs order
 
-// How many times a muscle comes up in 7 days, at 5 sessions a week
-export function hitsPerWeek(m: Muscle) {
-  const days = DAYS.filter((d) => d.exercises.some((x) => exercise(x.exerciseId).primary === m)).length;
-  return Math.max(1, (days / ROTATION.length) * SESSIONS_PER_WEEK);
+// How many times a muscle comes up in 7 days at the planned days a week
+export function hitsPerWeek(m: Muscle, settings: Settings) {
+  const days = programFor(settings).days.map(day);
+  const hits = days.filter((d) => d.exercises.some((x) => exercise(settings.swaps[x.exerciseId] ?? x.exerciseId).primary === m)).length;
+  return Math.max(1, (hits / days.length) * daysFor(settings));
 }
 
 export type PlannedExercise = {
@@ -44,6 +48,8 @@ export type PlannedExercise = {
   templateExerciseId: string; // the slot in the day, for swaps
   sets: number;
   catchUpSets: number;
+  repMin?: number; // this goal's range (older saved plans don't have it)
+  repMax?: number;
   rirTarget: string;
   suggestion: Suggestion;
 };
@@ -63,9 +69,10 @@ function sortedSessions(sessions: Session[]) {
 
 // John's own order if he set one, as long as it still has every day once
 export function rotationFor(settings: Settings): string[] {
+  const days = programFor(settings).days;
   const r = settings.rotation;
-  const valid = r && r.length === ROTATION.length && ROTATION.every((id) => r.includes(id));
-  return valid ? r : ROTATION;
+  const valid = r && r.length === days.length && days.every((id) => r.includes(id));
+  return valid ? r : days;
 }
 
 export function nextDayId(sessions: Session[], settings: Settings): string {
@@ -88,9 +95,11 @@ export function isDeload(settings: Settings, now: Date) {
 
 // Reps in reserve: start the block further from failure and get closer
 // as it goes on. Isolation work can go a bit closer than big presses.
-export function rirTarget(kind: 'compound' | 'isolation', week: number, deload: boolean) {
+// For strength, heavy sets stay further away: failure adds little strength.
+export function rirTarget(kind: 'compound' | 'isolation', week: number, deload: boolean, goal: Goal = 'hypertrophy') {
   if (deload) return '3-4';
-  const steps = kind === 'compound' ? ['2-3', '2', '1-2', '1-2', '1'] : ['1-2', '1', '0-1', '0-1', '0-1'];
+  const compound = goal === 'strength' ? ['2-3', '2-3', '2', '2', '1-2'] : ['2-3', '2', '1-2', '1-2', '1'];
+  const steps = kind === 'compound' ? compound : ['1-2', '1', '0-1', '0-1', '0-1'];
   return steps[Math.min(week, steps.length - 1)];
 }
 
@@ -117,7 +126,7 @@ export function deloadSuggestion(sessions: Session[], settings: Settings, now: D
   let slipping = 0;
   for (const s of recent) {
     for (const ex of s.exercises) {
-      const r = suggest(ex.exerciseId, sessions.filter((x) => x.finishedAt <= s.finishedAt), { comeback: false, deload: false });
+      const r = suggest(ex.exerciseId, sessions.filter((x) => x.finishedAt <= s.finishedAt), { comeback: false, deload: false, goal: goalFor(settings) });
       if (r.stalled) slipping++;
     }
   }
@@ -144,20 +153,22 @@ export function planNext(sessions: Session[], settings: Settings, now = new Date
   const fullWindow = now.getTime() - windowStart >= 7 * DAY_MS;
   const done = rollingVolume(all, now);
   const pause = catchUpPause(health, now);
+  const goal = goalFor(settings);
+  const fixed = !!programFor(settings).fixedSets && programFor(settings).days.includes(template.id);
 
-  const slots = template.exercises.map((x) => ({
-    templateExerciseId: x.exerciseId,
-    exerciseId: settings.swaps[x.exerciseId] ?? x.exerciseId,
-    baseSets: x.baseSets,
-  }));
+  const slots = template.exercises.map((x) => {
+    const exerciseId = settings.swaps[x.exerciseId] ?? x.exerciseId;
+    // A slot's own reps stay with its exercise, not a replacement for another muscle
+    return { templateExerciseId: x.exerciseId, exerciseId, baseSets: x.baseSets, reps: x.reps };
+  });
   const primaries = [...new Set(slots.map((s) => exercise(s.exerciseId).primary))];
 
   // How many sets each muscle should get today, and how many are catch-up
   const plannedFor: Partial<Record<Muscle, { total: number; catchUp: number }>> = {};
-  for (const m of primaries) {
-    const target = weeklyTarget(m, settings.mode, week, deload);
+  for (const m of fixed ? [] : primaries) {
+    const target = targetFor(m, settings, week, deload);
     if (target === 0) continue;
-    const dose = target / hitsPerWeek(m);
+    const dose = target / hitsPerWeek(m, settings);
     let total = dose;
     if (!comeback && !deload && fullWindow && !pause) {
       const need = target - (done[m] ?? 0);
@@ -196,14 +207,16 @@ export function planNext(sessions: Session[], settings: Settings, now = new Date
     return total;
   };
   const firstPass = setsFor({}, slots.map((s) => s.baseSets));
-  const sizes = setsFor(secondaryCredit(firstPass), firstPass);
+  const sizes = fixed
+    ? slots.map((s) => (deload ? Math.max(1, Math.ceil(s.baseSets / 2)) : s.baseSets))
+    : setsFor(secondaryCredit(firstPass), firstPass);
 
   // Hand each muscle's catch-up sets to its exercises, first ones first
   const catchUpLeft: Partial<Record<Muscle, number>> = {};
   for (const m of primaries) catchUpLeft[m] = plannedFor[m]?.catchUp ?? 0;
 
   const exercises: PlannedExercise[] = slots.map((s, i) => {
-    const e = exercise(s.exerciseId);
+    const e = withGoalReps(s.exerciseId, goal, s.reps);
     const left = catchUpLeft[e.primary] ?? 0;
     const catchUpSets = Math.min(left, Math.max(0, sizes[i] - 1));
     catchUpLeft[e.primary] = left - catchUpSets;
@@ -212,15 +225,17 @@ export function planNext(sessions: Session[], settings: Settings, now = new Date
       templateExerciseId: s.templateExerciseId,
       sets: deload ? Math.max(1, sizes[i]) : sizes[i],
       catchUpSets,
-      rirTarget: rirTarget(e.kind, week, deload),
-      suggestion: suggest(s.exerciseId, all, { comeback, deload }),
+      repMin: e.repMin,
+      repMax: e.repMax,
+      rirTarget: rirTarget(e.kind, week, deload, goal),
+      suggestion: suggest(s.exerciseId, all, { comeback, deload, goal, reps: s.reps }),
     };
   });
 
   const notes: string[] = [];
   if (deload) notes.push('Deload week: about half the sets, same weights, 3-4 reps in reserve.');
   if (comeback) notes.push(`${Math.floor(gapDays)} days since your last workout. Today is normal volume. Catch-up sets start next session.`);
-  if (!fullWindow && !comeback && !deload) notes.push('Building your first week of history. Catch-up starts once there are 7 days to compare.');
+  if (!fullWindow && !comeback && !deload && !fixed) notes.push('Building your first week of history. Catch-up starts once there are 7 days to compare.');
   if (pause && !comeback && !deload) notes.push(pause);
   const caught = exercises.reduce((t, e) => t + e.catchUpSets, 0);
   if (caught > 0) notes.push(`${caught} catch-up ${caught === 1 ? 'set' : 'sets'} added for muscles that fell behind this week.`);
