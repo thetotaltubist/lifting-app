@@ -115,7 +115,10 @@ export default function SettingsScreen() {
           <Button title="Change exercises" kind="plain" onPress={() => router.push('/program')} />
         </Card>
 
-        <Button title="How the plan works" kind="plain" onPress={() => router.push('/science')} />
+        <View style={{ gap: 8 }}>
+          <Button title="1 rep max calculator" kind="plain" onPress={() => router.push('/one-rm')} />
+          <Button title="How the plan works" kind="plain" onPress={() => router.push('/science')} />
+        </View>
         <AppVersion />
       </ScrollView>
     </SafeAreaView>

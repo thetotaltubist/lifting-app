@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import { alternativesFor, day, exercise, makeCustomExercise, painAreasFor, setCustomExercises } from './exercises';
 import { planNext, nextDayId, ROTATION, rotationFor } from './plan';
 import { PROGRAMS, suggestPrograms, withGoalReps } from './programs';
+import { estimate1RM, weightForReps } from './oneRm';
 import { suggest } from './progression';
 import { weeklyRecap } from './recap';
 import { rollingVolume, targetFor, weeklyTarget } from './volume';
@@ -430,4 +431,30 @@ test('a new program starts at its own first day', () => {
   const old = doSession([], at(0)); // a Push / Pull / Legs day
   assert.equal(nextDayId(old, s), 'upper-a');
   assert.deepEqual(rotationFor({ ...s, rotation: ROTATION }), PROGRAMS.find((p) => p.id === 'upper-lower')!.days);
+});
+
+test('1 rep max estimate and weight for reps', () => {
+  assert.equal(estimate1RM(200, 1), 200);
+  const max = estimate1RM(200, 10); // Epley 266.7, Brzycki 266.7
+  assert.ok(Math.abs(max - 266.7) < 1);
+  assert.ok(Math.abs(weightForReps(max, 10) - 200) < 1);
+  assert.ok(weightForReps(max, 5) > weightForReps(max, 10));
+});
+
+test('a new goal with very different reps starts from an estimated 1 rep max', () => {
+  // 10 reps at 200 for hypertrophy, then a strength block (4-6 reps)
+  const s: Session = {
+    id: 'g',
+    dayId: 'push-a',
+    startedAt: at(0).toISOString(),
+    finishedAt: at(0).toISOString(),
+    exercises: [{ exerciseId: 'pl-flat-press', sets: [1, 2, 3].map(() => ({ weight: 200, reps: 10, rir: 1, done: true })) }],
+  };
+  const r = suggest('pl-flat-press', [s], { comeback: false, deload: false, goal: 'strength' });
+  // About 267 lb max; 4 reps with 2 in reserve is ~6 all-out, about 230
+  assert.equal(r.targetReps, 4);
+  assert.ok(r.weight! >= 220 && r.weight! <= 240, String(r.weight));
+  assert.match(r.why, /1 rep max/);
+  // Same goal: normal double progression
+  assert.equal(suggest('pl-flat-press', [s], { comeback: false, deload: false }).weight, 210); // top of 6-10 hit, so +10
 });

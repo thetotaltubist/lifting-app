@@ -89,6 +89,12 @@ export const SCIENCE: { title: string; body: string; strength: 'Strong' | 'Moder
       'Double progression: keep the weight until every set hits the top of the rep range, then add weight and start at the bottom. In a cut, holding your weights is a win. The app flags a stall only after 3 sessions without progress.',
   },
   {
+    title: 'Estimating your 1 rep max',
+    strength: 'Moderate',
+    body:
+      'A set of a few reps close to failure predicts your 1 rep max well, usually within a few percent up to about 10 reps, so there is no need to test a true max. The app averages two common formulas (Epley and Brzycki). When a new block changes your rep range, it uses this estimate to pick a starting weight for the new reps with 2 left in the tank.',
+  },
+  {
     title: 'Deloads',
     strength: 'Emerging',
     body:
@@ -143,5 +149,6 @@ export const REFERENCES = [
   'Grgic J, Schoenfeld BJ, Orazem J, Sabol F. Effects of resistance training performed to repetition failure or non-failure on muscular strength and hypertrophy: a systematic review and meta-analysis. J Sport Health Sci. 2022;11(2):202-211.',
   'Campos GER, Luecke TJ, Wendeln HK, et al. Muscular adaptations in response to three different resistance-training regimens: specificity of repetition maximum training zones. Eur J Appl Physiol. 2002;88(1-2):50-60.',
   'de Salles BF, Simão R, Miranda F, et al. Rest interval between sets in strength training. Sports Med. 2009;39(9):765-777.',
+  'LeSuer DA, McCormick JH, Mayhew JL, Wasserstein RL, Arnold MD. The accuracy of prediction equations for estimating 1-RM performance in the bench press, squat, and deadlift. J Strength Cond Res. 1997;11(4):211-213.',
   'Morton RW, Murphy KT, McKellar SR, et al. A systematic review, meta-analysis and meta-regression of the effect of protein supplementation on resistance training-induced gains in muscle mass and strength. Br J Sports Med. 2018;52(6):376-384.',
 ];
