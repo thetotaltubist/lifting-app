@@ -14,7 +14,7 @@ const ACTIVE = 'active-workout';
 
 export function defaultSettings(): Settings {
   return {
-    mode: 'cut',
+    mode: 'build',
     unit: 'lb',
     blockStart: new Date().toISOString(),
     deloadStart: null,

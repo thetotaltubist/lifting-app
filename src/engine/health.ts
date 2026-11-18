@@ -8,16 +8,12 @@ import { DAY_MS } from './volume';
 //   more (protein first) and pauses catch-up sets.
 // - Sleep has a small effect. After 3 short nights in a row, catch-up
 //   sets are skipped; the normal workout stays the same.
-// - HRV and resting heart rate are shown for information only. They never
-//   change sets or weights.
 // ------------------------------------------------------------------
 
 export type HealthData = {
   fetchedAt: string;
   weights: { date: string; lb: number }[];
   sleep: { night: string; hours: number }[]; // night = the morning you woke up, YYYY-MM-DD
-  hrv: { date: string; value: number }[];
-  restingHR: { date: string; value: number }[];
 };
 
 export const FAST_LOSS_PCT = 1; // % of body weight per week
@@ -78,13 +74,6 @@ export function shortNightStreak(sleep: HealthData['sleep'], now: Date) {
     streak++;
   }
   return streak;
-}
-
-// HRV or resting HR: the last 7 days against the 60 days before
-export function baselineCompare(list: { date: string; value: number }[], now: Date) {
-  const recent = avg(within(list, now, 7, 0).map((x) => x.value));
-  const baseline = avg(within(list, now, 67, 7).map((x) => x.value));
-  return { recent, baseline };
 }
 
 export function proteinTarget(weightLb: number) {

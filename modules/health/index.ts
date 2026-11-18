@@ -9,7 +9,6 @@ type HealthNative = {
   requestAccess(): Promise<boolean>;
   bodyMass(days: number): Promise<{ date: string; lb: number }[]>;
   sleep(days: number): Promise<{ night: string; hours: number }[]>;
-  dailyAverage(kind: 'hrv' | 'restingHeartRate', days: number): Promise<{ date: string; value: number }[]>;
 };
 
 const native = requireOptionalNativeModule<HealthNative>('Health');
@@ -40,4 +39,3 @@ async function safe<T>(read: () => Promise<T[]> | undefined): Promise<T[]> {
 
 export const readBodyMass = (days: number) => safe(() => native?.bodyMass(days));
 export const readSleep = (days: number) => safe(() => native?.sleep(days));
-export const readDailyAverage = (kind: 'hrv' | 'restingHeartRate', days: number) => safe(() => native?.dailyAverage(kind, days));

@@ -1,24 +1,29 @@
 import { DayTemplate, Exercise, Muscle } from './types';
 
 // ------------------------------------------------------------------
-// Exercise library. No barbell pressing and no dips because of the AC
-// joint. Every exercise offers an optional pain rating afterward.
+// Exercise library. The default days lean on machines, dumbbells and
+// cables, which are easier on the joints; barbell presses are here as
+// swaps. With the pain check on, every exercise asks for an optional pain
+// rating afterward.
 // Secondary muscles get half credit per set (an estimate, not exact).
 // ------------------------------------------------------------------
 
 export const EXERCISES: Exercise[] = [
   // Chest
-  { id: 'pl-incline-press', name: 'Plate-loaded incline press', primary: 'chest', secondary: ['frontDelts', 'triceps'], repMin: 6, repMax: 10, kind: 'compound', increment: 10, tip: 'Stop the handles an inch above where your shoulder starts to pinch.' },
+  { id: 'pl-incline-press', name: 'Plate-loaded incline press', primary: 'chest', secondary: ['frontDelts', 'triceps'], repMin: 6, repMax: 10, kind: 'compound', increment: 10, tip: 'If your shoulder pinches at the bottom, stop the handles just above that point.' },
   { id: 'pl-flat-press', name: 'Plate-loaded flat press', primary: 'chest', secondary: ['frontDelts', 'triceps'], repMin: 6, repMax: 10, kind: 'compound', increment: 10 },
-  { id: 'db-incline-press', name: 'Incline DB press (neutral grip)', primary: 'chest', secondary: ['frontDelts', 'triceps'], repMin: 8, repMax: 12, kind: 'compound', increment: 5, tip: 'Palms facing each other is usually easiest on the AC joint.' },
+  { id: 'db-incline-press', name: 'Incline DB press (neutral grip)', primary: 'chest', secondary: ['frontDelts', 'triceps'], repMin: 8, repMax: 12, kind: 'compound', increment: 5, tip: 'Palms facing each other is usually easiest on the shoulders.' },
   { id: 'db-flat-press', name: 'Flat DB press (neutral grip)', primary: 'chest', secondary: ['frontDelts', 'triceps'], repMin: 8, repMax: 12, kind: 'compound', increment: 5 },
-  { id: 'cable-fly', name: 'Cable fly', primary: 'chest', secondary: [], repMin: 10, repMax: 15, kind: 'isolation', increment: 5, tip: 'Stop when your hands are about shoulder-width apart. Crossing over loads the AC joint.' },
+  { id: 'barbell-bench', name: 'Barbell bench press', primary: 'chest', secondary: ['frontDelts', 'triceps'], repMin: 5, repMax: 10, kind: 'compound', increment: 5, tip: 'Use a spotter or safety arms. A slightly narrower grip is easier on the shoulders.' },
+  { id: 'barbell-incline-bench', name: 'Incline barbell bench press', primary: 'chest', secondary: ['frontDelts', 'triceps'], repMin: 6, repMax: 10, kind: 'compound', increment: 5 },
+  { id: 'cable-fly', name: 'Cable fly', primary: 'chest', secondary: [], repMin: 10, repMax: 15, kind: 'isolation', increment: 5, tip: 'Stop when your hands are about shoulder-width apart. Crossing over adds little and is harder on the shoulders.' },
   { id: 'pec-deck', name: 'Pec deck', primary: 'chest', secondary: [], repMin: 10, repMax: 15, kind: 'isolation', increment: 5, tip: 'Stop before the handles touch.' },
 
   // Shoulders
   { id: 'machine-shoulder-press', name: 'Shoulder press (machine or plate-loaded)', primary: 'frontDelts', secondary: ['sideDelts', 'triceps'], repMin: 8, repMax: 12, kind: 'compound', increment: 10 },
   { id: 'db-shoulder-press', name: 'Seated DB shoulder press (neutral grip)', primary: 'frontDelts', secondary: ['sideDelts', 'triceps'], repMin: 8, repMax: 12, kind: 'compound', increment: 5 },
-  { id: 'landmine-press', name: 'Landmine press', primary: 'frontDelts', secondary: ['chest', 'triceps'], repMin: 8, repMax: 12, kind: 'compound', increment: 5, tip: 'The angled path is often the easiest press for a sore AC joint.' },
+  { id: 'landmine-press', name: 'Landmine press', primary: 'frontDelts', secondary: ['chest', 'triceps'], repMin: 8, repMax: 12, kind: 'compound', increment: 5, tip: 'The angled path is often the easiest press for sore shoulders.' },
+  { id: 'barbell-ohp', name: 'Standing overhead press', primary: 'frontDelts', secondary: ['sideDelts', 'triceps'], repMin: 5, repMax: 10, kind: 'compound', increment: 5 },
   { id: 'db-lateral-raise', name: 'DB lateral raise', primary: 'sideDelts', secondary: [], repMin: 12, repMax: 20, kind: 'isolation', increment: 5 },
   { id: 'cable-lateral-raise', name: 'Cable lateral raise', primary: 'sideDelts', secondary: [], repMin: 12, repMax: 20, kind: 'isolation', increment: 5 },
   { id: 'reverse-pec-deck', name: 'Reverse pec deck', primary: 'rearDelts', secondary: [], repMin: 12, repMax: 20, kind: 'isolation', increment: 5 },
@@ -54,7 +59,7 @@ export const EXERCISES: Exercise[] = [
   { id: 'lying-leg-curl', name: 'Lying leg curl', primary: 'hamstrings', secondary: [], repMin: 10, repMax: 15, kind: 'isolation', increment: 5 },
   { id: 'hack-squat', name: 'Hack squat', primary: 'quads', secondary: ['glutes'], repMin: 6, repMax: 10, kind: 'compound', increment: 10 },
   { id: 'leg-press', name: 'Leg press', primary: 'quads', secondary: ['glutes'], repMin: 8, repMax: 12, kind: 'compound', increment: 10 },
-  { id: 'barbell-squat', name: 'Barbell back squat', primary: 'quads', secondary: ['glutes'], repMin: 6, repMax: 10, kind: 'compound', increment: 5, tip: 'A high bar or a safety squat bar is easier on the shoulders than low bar. Hack squat works if it bothers the AC joint.' },
+  { id: 'barbell-squat', name: 'Barbell back squat', primary: 'quads', secondary: ['glutes'], repMin: 6, repMax: 10, kind: 'compound', increment: 5, tip: 'A high bar or a safety squat bar is easier on the shoulders than low bar. Hack squat works if it bothers them.' },
   { id: 'pendulum-squat', name: 'Pendulum squat', primary: 'quads', secondary: ['glutes'], repMin: 8, repMax: 12, kind: 'compound', increment: 10 },
   { id: 'leg-extension', name: 'Leg extension', primary: 'quads', secondary: [], repMin: 10, repMax: 15, kind: 'isolation', increment: 5 },
   { id: 'standing-calf-raise', name: 'Standing calf raise', primary: 'calves', secondary: [], repMin: 8, repMax: 15, kind: 'isolation', increment: 10 },
@@ -68,7 +73,7 @@ export const EXERCISES: Exercise[] = [
 const byId = new Map(EXERCISES.map((e) => [e.id, e]));
 let custom: Exercise[] = [];
 
-// Exercises John added himself. Called whenever settings load.
+// Exercises you added yourself. Called whenever settings load.
 export function setCustomExercises(list: Exercise[]) {
   for (const e of custom) byId.delete(e.id);
   custom = list;
@@ -97,7 +102,7 @@ export function makeCustomExercise(fields: Omit<Exercise, 'id' | 'secondary'> & 
 }
 
 // ------------------------------------------------------------------
-// The rotation, built from John's own split. A and B days use the same
+// The Push / Pull / Legs rotation. A and B days use the same
 // movements in a slightly different order or variation.
 // Base sets are a starting point; the planner scales them each session.
 // ------------------------------------------------------------------
@@ -408,7 +413,7 @@ export const MUSCLE_NAMES: Record<Muscle, string> = {
   abs: 'Abs',
 };
 
-// Body parts to offer when John reports pain, by day type
+// Body parts to offer when you report pain, by day type
 const PAIN_AREAS: Record<string, string[]> = {
   push: ['Shoulder', 'Elbow'],
   pull: ['Back', 'Elbow'],

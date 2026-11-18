@@ -1,58 +1,50 @@
-# Mayg & Jaown
+# Lift (working title)
 
-John's personal hypertrophy app for iPhone and iPad (Expo, same setup as Total Practice).
+A simple, evidence-based lifting app for busy lifters. It plans every workout around one idea: get your weekly sets in for every muscle, even when life gets in the way. Name, icon and App Store listing are still to come.
+
+Started from Mayg & Jaown (John's personal app), keeping the training engine and dropping everything personal.
 
 ## What it does
 
-- **Next workout, no calendar.** The app always shows the next day in the rotation (Push A, Pull A, Legs A, Push B, Pull B, Legs B), whatever day of the week it is. "Do a different day" lets you jump around.
-- **Programs and goals.** Settings → Start a new block asks two things: the goal (strength, hypertrophy or endurance) and how many days a week you'll lift (2-6). It then suggests the programs that fit: Full body (2-3 days), 5x5 (3 days, strength), Upper / Lower (4), 5-day hybrid (Upper, Lower, Push, Pull, Legs), Push / Pull / Legs (5-6, the original) and Bro split (5-6). The goal sets reps, rest, reps in reserve and weekly sets (strength about 30% fewer, endurance 20% fewer). Fewer days aims for fewer weekly sets. Each program and goal has its evidence on "How the plan works". Without a new block, nothing changes: Push / Pull / Legs, hypertrophy, 5 days.
-- **Rolling 7-day volume.** It counts hard sets per muscle over the last 7 days against a weekly target. Sets for helper muscles count as half.
+- **Next workout, no calendar.** The app always shows the next day in the rotation, whatever day of the week it is. "Do a different day" lets you jump around.
+- **Programs and goals.** Settings → Start a new block asks the goal (strength, hypertrophy or endurance) and how many days a week you'll lift (2-6), then suggests the programs that fit: Full body (2-3 days), 5x5 (3 days, strength), Upper / Lower (4), 5-day hybrid, Push / Pull / Legs (5-6) and Bro split (5-6). The goal sets reps, rest, reps in reserve and weekly sets.
+- **Rolling 7-day volume.** Hard sets per muscle over the last 7 days against a weekly target. Sets for helper muscles count as half.
 - **Catch-up.** If a muscle falls behind (missed days, or fewer days than planned), upcoming sessions add up to 3 catch-up sets for it, capped at 10 sets per muscle per session. After 3+ days off, the first session back is normal volume.
-- **Progressive overload.** Double progression: hit the top of the rep range on every set, then the weight goes up. When a new block changes the rep range a lot, the starting weight comes from an estimated 1 rep max of your last sets.
-- **1 rep max calculator** (Settings): estimate a max from any set, see weights for 1-12 reps, and your own estimated maxes from the last 30 days.
-- **AC joint.** No barbell pressing or dips. Pressing offers an optional 0-10 shoulder pain rating (skipped counts as 0). 3+ holds the weight, 5+ drops it about 10% and suggests a swap.
+- **Progressive overload.** Double progression: hit the top of the rep range on every set, then the weight goes up. A new block with a different rep range starts from an estimated 1 rep max.
+- **1 rep max calculator** in Settings.
+- **Pain check** (Settings, on by default). An optional 0-10 rating after each exercise. 3+ holds the weight, 5+ drops it about 10% and suggests a swap.
 - **Cut / Build modes** and **4-week ramping blocks**, with a deload suggested when lifts stall.
-- **Apple Health (Body tab).** Weight trend: losing more than 1% a week pauses catch-up sets and suggests eating more, protein first. Three nights under 6 hours skips catch-up sets. HRV and resting heart rate are shown but never change the plan. Read-only.
-- **Rest timer.** Checking off a set starts a countdown with a suggested rest (3:00 heavy compounds, 2:30 compounds, 1:30 isolation, +30s after a set to failure) and a notification when it's up.
-- "How the plan works" in the app lists the research behind each rule.
-
-## Aunt Mandy's side
-
-The Jaown & Mayg / Mandy switch at the top of the Next and Settings screens flips the whole app to Aunt Mandy's own program (pink theme, her own Body tab with her Apple Health), with her own data (stored under separate keys, so John's history is never touched). The app opens to whoever used it last.
-
-- **5 workouts in order:** Upper Body Strength + Cardio, Lower Body + Glutes, Cardio + Core, Total Body Strength Endurance, Cardio Strength Circuit. High-rep dumbbell circuits (12-20 reps) with cardio intervals, warm-up and cooldown.
-- **Guided like a class:** one move at a time, timers for cardio, holds and rests run on their own.
-- **Her dumbbells:** 5, 8, 10, 12, 15 and 20 lb. Weights go up one dumbbell when she hits the top of the range every round with good form and no pain.
-- **Gym days:** on weekends (changeable) she gets her own machine workouts instead of the circuits: upper and lower alternate, 3 straight sets of 12-15 on each machine before moving on, no cardio, with start and finish photos of each machine.
-- **Six weeks, three levels:** nothing gets harder on a schedule. After each workout she answers four quick questions (effort, form, pain, recovery), and the app only suggests a new level after at least 8 good workouts.
+- **Apple Health (Body tab), weight and sleep only.** Losing more than 1% a week pauses catch-up sets and suggests eating more, protein first. Three nights under 6 hours skips catch-up sets. Read-only.
+- **Rest timer** with a notification when it's up.
+- "How the plan works" lists the research behind each rule.
 
 Everything is stored on the phone.
+
+## Before the first build
+
+The app ID (`com.jdicesar.liftnew`), name and icon are placeholders. Set the real ones in `app.json` once the name is picked, because the app ID can't change after the app is on the App Store. Then link a new Expo project with `npx eas-cli@27 init` and turn over-the-air updates back on with `npx eas-cli@27 update:configure`.
 
 ## Run it on your iPhone or iPad
 
 ```bash
-cd lifting-app
 npm install
 npx expo run:ios --device
 ```
 
-Pick your iPhone or iPad from the list (cable or the same Wi-Fi).
-
 ## Over-the-air updates
 
-JS-only changes (screens, text, workouts, the training engine) can go straight to the phones without a new TestFlight build:
+Once the Expo project is linked (above):
 
 ```bash
-cd lifting-app
 git checkout main && git pull
 npm run ota -- "what changed"
 ```
 
-The app checks for an update when it opens. If the download finishes while the loading screen is up, it restarts into it right away; otherwise the update is used the next time the app is opened fresh. Coming back to the app between sets checks again but never restarts it mid-workout. Settings shows the version, build and update date at the bottom.
-
-Each update only goes to the build number it was published for (runtime version is `version(buildNumber)`, e.g. `1.0.0(14)`). Anything native, like a new Expo module, a permission, the icon or the splash, still needs a new TestFlight build with a higher build number.
+Anything native, like a new Expo module, a permission, the icon or the splash, still needs a new TestFlight build with a higher build number.
 
 ## Checks
+
+These run automatically on every pull request.
 
 ```bash
 npm test          # training engine tests

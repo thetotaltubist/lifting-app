@@ -76,10 +76,11 @@ export type Settings = {
   deloadStart: string | null; // ISO, set while a deload week is running
   lastDeloadEnd: string | null; // ISO
   swaps: Record<string, string>; // template exercise id -> replacement id, on every day it appears
-  customExercises: Exercise[]; // exercises and machines John added himself
+  customExercises: Exercise[]; // exercises and machines you added yourself
   nextDayOverride: string | null;
-  rotation?: string[]; // day ids in John's order; missing means the program's order
+  rotation?: string[]; // day ids in your own order; missing means the program's order
   program?: string; // program id; missing means Push / Pull / Legs
   goal?: Goal; // missing means hypertrophy
-  daysPerWeek?: number; // how many days a week he plans to lift; missing means 5
+  daysPerWeek?: number; // how many days a week you plan to lift; missing means 5
+  painCheck?: boolean; // ask for a 0-10 pain rating after each exercise; missing means on
 };

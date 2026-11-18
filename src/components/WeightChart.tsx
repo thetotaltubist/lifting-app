@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Text, useColorScheme, View } from 'react-native';
 import Svg, { Circle, Line, Path } from 'react-native-svg';
 import { DAY_MS } from '../engine/volume';
-import { activeTheme, hexColors, themeColors } from '../theme';
+import { hexColors, themeColors } from '../theme';
 import { Chip, Muted } from './ui';
 
 // ------------------------------------------------------------------
@@ -105,7 +105,7 @@ export default function WeightChart({ weights, unit }: { weights: { date: string
   const colors = themeColors();
   const surface = hexColors(scheme).card;
   const grid = hexColors(scheme).border;
-  const line = activeTheme() === 'her' ? hexColors(scheme).accent : LINE[scheme];
+  const line = LINE[scheme];
   const fmtDate = (t: number) => new Date(t).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   const fmt = (v: number | null) => (v == null ? '—' : `${v.toFixed(1)} ${unit}`);
   const a = active != null ? points[active] : null;

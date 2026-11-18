@@ -1,7 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Alert, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import PersonSwitch from '../../components/PersonSwitch';
 import { router, useFocusEffect } from 'expo-router';
 import { Badge, Button, Card, Chip, Muted, styles, Title } from '../../components/ui';
 import { day, exercise } from '../../engine/exercises';
@@ -92,7 +91,6 @@ export default function NextScreen() {
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top']}>
       <ScrollView contentContainerStyle={styles.screen}>
-        <PersonSwitch current="john" />
         <Muted>{plan.deload ? 'Deload week' : `Block week ${plan.blockWeek + 1}`} · {programFor(settings).name} · {settings.mode === 'cut' ? 'Cut' : 'Build'}</Muted>
         <Title>{plan.day.name}</Title>
         <Muted style={{ marginBottom: 14 }}>

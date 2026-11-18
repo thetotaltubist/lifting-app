@@ -1,9 +1,8 @@
 import ExpoModulesCore
 import HealthKit
 
-// Read-only Apple Health access: body weight, sleep, HRV and resting heart
-// rate. Oura and Eight Sleep reach the app through Health. Nothing is
-// written back.
+// Read-only Apple Health access: body weight and sleep. Sleep from any
+// tracker that writes to Health counts. Nothing is written back.
 public class HealthModule: Module {
   private let store = HKHealthStore()
   private let iso = ISO8601DateFormatter()
@@ -11,8 +10,6 @@ public class HealthModule: Module {
   private var readTypes: Set<HKObjectType> {
     var types = Set<HKObjectType>()
     if let t = HKQuantityType.quantityType(forIdentifier: .bodyMass) { types.insert(t) }
-    if let t = HKQuantityType.quantityType(forIdentifier: .heartRateVariabilitySDNN) { types.insert(t) }
-    if let t = HKQuantityType.quantityType(forIdentifier: .restingHeartRate) { types.insert(t) }
     if let t = HKCategoryType.categoryType(forIdentifier: .sleepAnalysis) { types.insert(t) }
     return types
   }
@@ -57,8 +54,8 @@ public class HealthModule: Module {
       self.store.execute(query)
     }
 
-    // Hours asleep per night, keyed by the morning you woke up. Watch, Oura
-    // and Eight Sleep often record the same night, so overlapping time is
+    // Hours asleep per night, keyed by the morning you woke up. A watch and
+    // another tracker often record the same night, so overlapping time is
     // only counted once.
     AsyncFunction("sleep") { (days: Int, promise: Promise) in
       guard let type = HKCategoryType.categoryType(forIdentifier: .sleepAnalysis) else {
@@ -93,34 +90,5 @@ public class HealthModule: Module {
       self.store.execute(query)
     }
 
-    // Daily averages for "hrv" (ms) or "restingHeartRate" (beats per minute)
-    AsyncFunction("dailyAverage") { (kind: String, days: Int, promise: Promise) in
-      let id: HKQuantityTypeIdentifier = kind == "hrv" ? .heartRateVariabilitySDNN : .restingHeartRate
-      let unit: HKUnit = kind == "hrv" ? .secondUnit(with: .milli) : HKUnit.count().unitDivided(by: .minute())
-      guard let type = HKQuantityType.quantityType(forIdentifier: id) else {
-        promise.resolve([])
-        return
-      }
-      let calendar = Calendar.current
-      let end = Date()
-      let start = calendar.startOfDay(for: calendar.date(byAdding: .day, value: -days, to: end) ?? end)
-      let query = HKStatisticsCollectionQuery(
-        quantityType: type,
-        quantitySamplePredicate: HKQuery.predicateForSamples(withStart: start, end: end, options: []),
-        options: .discreteAverage,
-        anchorDate: start,
-        intervalComponents: DateComponents(day: 1)
-      )
-      query.initialResultsHandler = { _, results, _ in
-        var out: [[String: Any]] = []
-        results?.enumerateStatistics(from: start, to: end) { stats, _ in
-          if let value = stats.averageQuantity()?.doubleValue(for: unit) {
-            out.append(["date": self.iso.string(from: stats.startDate), "value": value])
-          }
-        }
-        promise.resolve(out)
-      }
-      self.store.execute(query)
-    }
   }
 }

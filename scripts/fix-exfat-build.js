@@ -1,4 +1,4 @@
-// The Seagate drive is formatted ExFAT, so macOS adds hidden "._" copies next
+// An external drive formatted ExFAT, so macOS adds hidden "._" copies next
 // to files, and the drive is slow. This works around both in Expo's build
 // scripts. Runs automatically after `npm install`.
 const fs = require('fs');

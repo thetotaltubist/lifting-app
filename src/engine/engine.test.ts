@@ -264,8 +264,6 @@ test('fast weight loss or short sleep pauses catch-up, never normal sets', () =>
     fetchedAt: iso(now),
     weights: [],
     sleep: [0, 1, 2].map((i) => ({ night: ymd(new Date(now.getTime() - i * DAY)), hours: 5 })),
-    hrv: [],
-    restingHR: [],
   };
   const paused = planNext(sessions, settings, now, tired);
   assert.equal(paused.exercises.reduce((t, e) => t + e.catchUpSets, 0), 0);

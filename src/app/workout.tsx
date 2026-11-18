@@ -342,7 +342,7 @@ export default function WorkoutScreen() {
                 )}
               </View>
 
-              {ex.sets.some((s) => s.done) && (
+              {settings.painCheck !== false && ex.sets.some((s) => s.done) && (
                 <View style={{ marginTop: 14 }}>
                   <Muted style={{ marginBottom: 6 }}>Any joint or muscle pain? Optional. Skip it if none (10 = worst).</Muted>
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>

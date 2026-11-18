@@ -1,7 +1,6 @@
 import { useCallback, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import PersonSwitch from '../../components/PersonSwitch';
 import AppVersion from '../../components/AppVersion';
 import { router, useFocusEffect } from 'expo-router';
 import { Button, Card, Chip, Muted, styles, Title } from '../../components/ui';
@@ -39,7 +38,6 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top']}>
       <ScrollView contentContainerStyle={styles.screen}>
-        <PersonSwitch current="john" />
         <Title>Settings</Title>
 
         <Card>
@@ -59,6 +57,18 @@ export default function SettingsScreen() {
           <View style={{ flexDirection: 'row', marginTop: 8 }}>
             <Chip label="lb" selected={settings.unit === 'lb'} onPress={() => change({ unit: 'lb' })} />
             <Chip label="kg" selected={settings.unit === 'kg'} onPress={() => change({ unit: 'kg' })} />
+          </View>
+        </Card>
+
+        <Card>
+          <Text style={styles.h2}>Pain check</Text>
+          <Muted style={{ marginVertical: 8 }}>
+            After each exercise, rate any joint or muscle pain from 0 to 10. 3 or more holds the weight, 5 or more drops it about 10% and
+            suggests a swap. Skipping a rating counts as no pain.
+          </Muted>
+          <View style={{ flexDirection: 'row' }}>
+            <Chip label="On" selected={settings.painCheck !== false} onPress={() => change({ painCheck: true })} />
+            <Chip label="Off" selected={settings.painCheck === false} onPress={() => change({ painCheck: false })} />
           </View>
         </Card>
 

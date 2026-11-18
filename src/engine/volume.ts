@@ -10,7 +10,7 @@ import { Goal, LoggedExercise, Mode, Muscle, Session, Settings } from './types';
 // Cut ranges sit a bit lower than build: in a calorie deficit, extra sets
 // buy less muscle and cost more recovery. They still start around 10 sets
 // for the big muscles, well above the minimum needed to keep muscle, since
-// John is an experienced lifter. Arms start at 10 too: presses and rows
+// the app is built for people who already lift. Arms start at 10 too: presses and rows
 // count as half, so a lower target filled up after one push and one pull
 // day. See science.ts.
 // Front delts have no target of their own; pressing covers them.

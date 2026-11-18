@@ -121,7 +121,7 @@ export const SCIENCE: { title: string; body: string; strength: 'Strong' | 'Moder
   {
     title: 'Protein',
     strength: 'Strong',
-    body: 'About 1.6 g per kg a day (around 160 g for you) covers most of the benefit, and more is fine. This matters more on tirzepatide, which cuts appetite.',
+    body: 'About 1.6 g per kg a day covers most of the benefit, and more is fine. The Body tab works out your number from your weight in Apple Health. It matters most in a cut, when hunger makes it easy to fall short.',
   },
 ];
 

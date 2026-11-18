@@ -5,12 +5,11 @@ import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { hideSplash } from '../splash';
 import { startLaunchUpdateCheck } from '../updates';
-import { colors, hexColors, herColors } from '../theme';
+import { colors, hexColors } from '../theme';
 
 export default function RootLayout() {
   const scheme = useColorScheme() === 'light' ? 'light' : 'dark';
-  const hex = hexColors(scheme, 'john');
-  const herHex = hexColors(scheme, 'her');
+  const hex = hexColors(scheme);
 
   useEffect(() => {
     hideSplash(startLaunchUpdateCheck());
@@ -35,19 +34,6 @@ export default function RootLayout() {
         <Stack.Screen name="one-rm" options={{ title: '1 rep max' }} />
         <Stack.Screen name="new-exercise" options={{ title: 'Add your own', presentation: 'modal' }} />
         <Stack.Screen name="week-summary" options={{ title: 'Last 7 days', presentation: 'modal' }} />
-        <Stack.Screen name="her" options={{ headerShown: false, animation: 'fade' }} />
-        <Stack.Screen
-          name="her-workout"
-          options={{
-            title: 'Workout',
-            gestureEnabled: false,
-            headerBackVisible: false,
-            headerStyle: { backgroundColor: herHex.bg },
-            headerTintColor: herHex.accent,
-            headerTitleStyle: { color: herHex.text },
-            contentStyle: { backgroundColor: herColors.bg },
-          }}
-        />
       </Stack>
     </GestureHandlerRootView>
   );

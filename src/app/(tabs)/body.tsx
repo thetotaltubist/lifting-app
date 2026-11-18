@@ -5,7 +5,6 @@ import { useFocusEffect } from 'expo-router';
 import { Button, Card, Muted, styles, Title } from '../../components/ui';
 import WeightChart from '../../components/WeightChart';
 import {
-  baselineCompare,
   FAST_LOSS_PCT,
   HealthData,
   proteinTarget,
@@ -75,8 +74,8 @@ export default function BodyScreen() {
           <Card>
             <Text style={styles.h2}>Connect Apple Health</Text>
             <Muted style={{ marginVertical: 8 }}>
-              Mayg &amp; Jaown reads your weight, sleep, HRV and resting heart rate. Oura and Eight Sleep come in through Health. Nothing is
-              written back, and nothing leaves your phone.
+              The app reads your weight and sleep. Sleep from any tracker that syncs to Health counts. Nothing is written back, and nothing
+              leaves your phone.
             </Muted>
             <Button title="Connect Apple Health" onPress={connect} />
           </Card>
@@ -88,11 +87,8 @@ export default function BodyScreen() {
   const trend = health ? weightTrend(health.weights, now) : null;
   const protein = trend ? proteinTarget(trend.average) : null;
   const short = health ? shortNightStreak(health.sleep, now) : 0;
-  const hrv = health ? baselineCompare(health.hrv, now) : null;
-  const rhr = health ? baselineCompare(health.restingHR, now) : null;
 
   const lastNights = [...(health?.sleep ?? [])].sort((a, b) => b.night.localeCompare(a.night)).slice(0, 7);
-  const fmt = (n: number | null, digits = 0) => (n == null ? '—' : n.toFixed(digits));
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top']}>
@@ -134,8 +130,7 @@ export default function BodyScreen() {
               Aim for about {protein.low} g a day. Up to {protein.high} g is fine.
             </Text>
             <Muted style={{ marginTop: 6 }}>
-              Based on 1.6 to 2.2 g per kg of body weight. With less appetite on tirzepatide, protein is the part to protect: a shake or
-              Greek yogurt are easy ways to get there.
+              Based on 1.6 to 2.2 g per kg of body weight. A shake or Greek yogurt are easy ways to get there.
             </Muted>
           </Card>
         )}
@@ -161,23 +156,6 @@ export default function BodyScreen() {
               </Muted>
             </>
           )}
-        </Card>
-
-        <Card>
-          <Text style={styles.h2}>HRV and resting heart rate</Text>
-          <Muted style={{ marginTop: 4, marginBottom: 10 }}>For your information only. These don&apos;t change your workouts.</Muted>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 3 }}>
-            <Muted>HRV, last 7 days</Muted>
-            <Text style={styles.body}>
-              {fmt(hrv?.recent ?? null)} ms <Text style={{ color: colors.muted }}>(usual {fmt(hrv?.baseline ?? null)})</Text>
-            </Text>
-          </View>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 3 }}>
-            <Muted>Resting HR, last 7 days</Muted>
-            <Text style={styles.body}>
-              {fmt(rhr?.recent ?? null)} bpm <Text style={{ color: colors.muted }}>(usual {fmt(rhr?.baseline ?? null)})</Text>
-            </Text>
-          </View>
         </Card>
 
         <Button title="Refresh from Health" kind="plain" onPress={() => refresh(true)} />

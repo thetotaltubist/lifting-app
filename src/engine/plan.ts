@@ -12,7 +12,7 @@ import { DayTemplate, Goal, Muscle, Session, Settings } from './types';
 // 2. For each muscle that day trains, compare the last 7 days of hard sets
 //    with the weekly target. A normal session gives the target divided by
 //    how often that muscle comes up in a week: how many of the program's
-//    days train it, times the days a week John plans to lift. Plan 6 and
+//    days train it, times the days a week you plan to lift. Plan 6 and
 //    lift 4, and the muscles that fell behind get catch-up sets.
 //    Fixed programs (5x5) keep their own sets and skip catch-up.
 // 3. If a muscle is behind (missed days), add catch-up sets: at most 3 per
@@ -67,7 +67,7 @@ function sortedSessions(sessions: Session[]) {
   return [...sessions].sort((a, b) => a.finishedAt.localeCompare(b.finishedAt));
 }
 
-// John's own order if he set one, as long as it still has every day once
+// Your own order if you set one, as long as it still has every day once
 export function rotationFor(settings: Settings): string[] {
   const days = programFor(settings).days;
   const r = settings.rotation;
